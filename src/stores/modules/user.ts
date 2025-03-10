@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 // 定义 Store
-export const useMemberStore = defineStore(
-  'member',
+export const useUserStore = defineStore(
+  'user',
   () => {
     // 会员信息
     const profile = ref<any>()
@@ -25,8 +25,18 @@ export const useMemberStore = defineStore(
       clearProfile,
     }
   },
-  // TODO: 持久化
+  // 持久化
   {
-    persist: true,
+    persist: {
+      // 小程序配置
+      storage: {
+        getItem(key: string) {
+          return uni.getStorageSync(key)
+        },
+        setItem(key: string, value: any) {
+          uni.setStorageSync(key, value)
+        },
+      },
+    },
   },
 )
