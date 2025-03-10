@@ -1,4 +1,11 @@
 {
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      // uni-ui 规则如下配置
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  },
   "pages": [
     //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
     {
@@ -16,19 +23,25 @@
     {
       "path": "pages/cart/cart",
       "style": {
-        "navigationBarTitleText": "购物车"
-      }
-    },
-    {
-      "path": "pages/category/category",
-      "style": {
-        "navigationBarTitleText": "分类"
+        "navigationBarTitleText": "礼物"
       }
     },
     {
       "path": "pages/login/login",
       "style": {
         "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/birthday/birthday",
+      "style": {
+        "navigationBarTitleText": "生日"
+      }
+    },
+    {
+      "path": "pages/gift/gift",
+      "style": {
+        "navigationBarTitleText": "礼物"
       }
     }
   ],
@@ -52,14 +65,14 @@
         "selectedIconPath": "static/tabs/home_selected.png"
       },
       {
-        "text": "分类",
-        "pagePath": "pages/category/category",
+        "text": "生日",
+        "pagePath": "pages/birthday/birthday",
         "iconPath": "static/tabs/category_default.png",
         "selectedIconPath": "static/tabs/category_selected.png"
       },
       {
-        "text": "购物车",
-        "pagePath": "pages/cart/cart",
+        "text": "礼物",
+        "pagePath": "pages/gift/gift",
         "iconPath": "static/tabs/cart_default.png",
         "selectedIconPath": "static/tabs/cart_selected.png"
       },
