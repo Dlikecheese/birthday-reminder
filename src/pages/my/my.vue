@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { useMemberStore } from '@/stores'
+import { useUserStore } from '@/stores'
 
-const memberStore = useMemberStore()
+const userStore = useUserStore()
 </script>
 
 <template>
   <view class="my">
-    <view>会员信息：{{ memberStore.profile }}</view>
+    <view>会员信息：{{ userStore.profile }}</view>
     <button
       @tap="
-        memberStore.setProfile({
+        userStore.setProfile({
           nickname: '黑马先锋',
         })
       "
@@ -19,7 +19,7 @@ const memberStore = useMemberStore()
     >
       保存用户信息
     </button>
-    <button @tap="memberStore.clearProfile()" size="mini" plain type="warn">清理用户信息</button>
+    <button @tap="userStore.clearProfile()" size="mini" plain type="warn">清理用户信息</button>
   </view>
 </template>
 
