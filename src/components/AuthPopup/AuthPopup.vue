@@ -17,7 +17,7 @@
       </view>
 
       <view class="btn-wrap">
-        <view class="btn prevent">拒绝</view>
+        <view class="btn prevent" @click="closePopup">拒绝</view>
         <view class="btn ok" @click="permit">允许</view>
       </view>
     </view>
@@ -28,13 +28,12 @@
 import { useUserStore } from '@/stores/index'
 import { http } from '@/utils/http'
 import { onMounted, ref } from 'vue'
-
 import type { UserInfo } from '@/types/common'
 
 const popupRef = ref(null) as any
+const userStore = useUserStore()
 let imgUrl = ref('')
 let name = ref('')
-const userStore = useUserStore()
 
 onMounted(async () => {
   // 获取用户信息
@@ -43,7 +42,7 @@ onMounted(async () => {
   name.value = userInfo.nickName
 })
 
-function getWXUserInfo(): Promise<UserInfo> {
+const getWXUserInfo = (): Promise<UserInfo> => {
   return new Promise((resolve, reject) => {
     uni.getUserInfo({
       provider: 'weixin',
@@ -62,20 +61,19 @@ function getWXUserInfo(): Promise<UserInfo> {
 
 // 允许授权
 const permit = async (): Promise<void> => {
-  userStore.setProfile({
-    ...userStore.profile,
-    avatarUrl: imgUrl.value,
-    name: name.value,
-  })
-
   // 添加用户信息
   await http({
     url: `/user/${userStore.profile.id}`,
     method: 'PUT',
     data: {
-      avatar: userStore.profile.avatarUrl,
-      name: userStore.profile.name,
+      avatar: imgUrl.value,
+      name: name.value,
     },
+  })
+  userStore.setProfile({
+    ...userStore.profile,
+    avatarUrl: imgUrl.value,
+    name: name.value,
   })
 
   uni.showToast({
@@ -98,6 +96,7 @@ const openPopup = (): void => {
 // 关闭弹窗
 const closePopup = (): void => {
   popupRef.value?.close?.()
+  uni.showTabBar()
 }
 
 // 暴露方法给父组件
@@ -106,4 +105,53 @@ defineExpose({
 })
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.popup-wrap {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px 10px 0 0;
+  .popup-wrap-header {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    .col {
+      font-size: 14px;
+      color: #a3a3a3;
+    }
+  }
+
+  .btn-wrap {
+    display: flex;
+    padding: 20px 0;
+    justify-content: center;
+  }
+  .btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    color: #fff;
+    width: 40%;
+  }
+  .prevent {
+    background-color: #efefef;
+    color: #333;
+    margin-right: 10px;
+  }
+  .ok {
+    background-color: #499d32;
+  }
+
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
+}
+</style>
