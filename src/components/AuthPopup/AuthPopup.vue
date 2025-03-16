@@ -63,7 +63,7 @@ const getWXUserInfo = (): Promise<UserInfo> => {
 const permit = async (): Promise<void> => {
   // 添加用户信息
   await http({
-    url: `/user/${userStore.profile.id}`,
+    url: `/user/${userStore.profile?.id}`,
     method: 'PUT',
     data: {
       avatar: imgUrl.value,
@@ -78,7 +78,7 @@ const permit = async (): Promise<void> => {
 
   uni.showToast({
     title: '登录成功',
-    icon: 'none',
+    icon: 'success',
   })
 
   // 隐藏底部导航栏
@@ -97,6 +97,11 @@ const openPopup = (): void => {
 const closePopup = (): void => {
   popupRef.value?.close?.()
   uni.showTabBar()
+  // 弹出您已取消授权
+  uni.showToast({
+    title: '您已取消授权',
+    icon: 'none',
+  })
 }
 
 // 暴露方法给父组件

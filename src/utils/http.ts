@@ -60,10 +60,16 @@ type Data<T> = {
 }
 // 2.2 添加类型，支持泛型
 export const http = <T>(options: UniApp.RequestOptions) => {
+  const userStore = useUserStore()
+
   // 1. 返回 Promise 对象
   return new Promise<Data<T>>((resolve, reject) => {
     uni.request({
       ...options,
+      header: {
+        authentication: userStore?.profile?.token,
+        ...options.header,
+      },
       // 响应成功
       success(res) {
         // 状态码 2xx， axios 就是这样设计的
@@ -79,7 +85,7 @@ export const http = <T>(options: UniApp.RequestOptions) => {
         } else {
           // 其他错误 -> 根据后端错误信息轻提示
           uni.showToast({
-            icon: 'none',
+            icon: 'error',
             title: (res.data as Data<T>).msg || '请求错误',
           })
           reject(res)
@@ -88,7 +94,7 @@ export const http = <T>(options: UniApp.RequestOptions) => {
       // 响应失败
       fail(err) {
         uni.showToast({
-          icon: 'none',
+          icon: 'error',
           title: '网络错误，换个网络试试',
         })
         reject(err)

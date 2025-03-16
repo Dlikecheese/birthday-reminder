@@ -8,21 +8,27 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { onTabItemTap } from '@dcloudio/uni-app'
-import { checkIsLogin } from '@/utils/util'
+import { isLogin, toLogin } from '@/utils/util'
 
 const authPopupRef = ref(null) as any
 
-onMounted(() => {
-  checkIsLogin(() => {
-    authPopupRef.value?.openPopup?.()
-  })
+onMounted(async () => {
+  await checkLogin()
 })
 
-onTabItemTap(() => {
-  checkIsLogin(() => {
-    authPopupRef.value?.openPopup?.()
-  })
+onTabItemTap(async () => {
+  await checkLogin()
 })
+
+const checkLogin = async () => {
+  if (!isLogin()) {
+    const userInfo = await toLogin()
+
+    if (!userInfo) {
+      authPopupRef.value?.openPopup?.()
+    }
+  }
+}
 </script>
 
 <style lang="scss"></style>

@@ -1,0 +1,341 @@
+/* 布局 */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.grid {
+  display: grid;
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* 文本 */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-lowercase {
+  text-transform: lowercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.font-normal {
+  font-weight: normal;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  /* 14px */
+}
+
+.text-base {
+  font-size: 1rem;
+  /* 16px */
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  /* 18px */
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  /* 20px */
+}
+
+/* 颜色 */
+.text-primary {
+  color: #007bff;
+}
+
+.text-secondary {
+  color: #6c757d;
+}
+
+.text-success {
+  color: #28a745;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+.text-warning {
+  color: #ffc107;
+}
+
+.text-info {
+  color: #17a2b8;
+}
+
+.bg-primary {
+  background-color: #007bff;
+}
+
+.bg-secondary {
+  background-color: #6c757d;
+}
+
+.bg-success {
+  background-color: #28a745;
+}
+
+.bg-danger {
+  background-color: #dc3545;
+}
+
+.bg-warning {
+  background-color: #ffc107;
+}
+
+.bg-info {
+  background-color: #17a2b8;
+}
+
+/* 间距 */
+.m-1 {
+  margin: 0.25rem;
+  /* 4px */
+}
+
+.m-2 {
+  margin: 0.5rem;
+  /* 8px */
+}
+
+.m-4 {
+  margin: 1rem;
+  /* 16px */
+}
+
+.m-8 {
+  margin: 2rem;
+  /* 32px */
+}
+
+.p-1 {
+  padding: 0.25rem;
+  /* 4px */
+}
+
+.p-2 {
+  padding: 0.5rem;
+  /* 8px */
+}
+
+.p-4 {
+  padding: 1rem;
+  /* 16px */
+}
+
+.p-8 {
+  padding: 2rem;
+  /* 32px */
+}
+
+/* 边框 */
+.border {
+  border: 1px solid #e2e8f0;
+}
+
+.border-2 {
+  border-width: 2px;
+}
+
+.border-4 {
+  border-width: 4px;
+}
+
+.border-primary {
+  border-color: #007bff;
+}
+
+.border-secondary {
+  border-color: #6c757d;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+  /* 4px */
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+  /* 8px */
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/* 阴影 */
+.shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 其他 */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-100 {
+  opacity: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
+.whitespace-pre {
+  white-space: pre;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Flex 容器中子元素的间距 */
+.gap-1 {
+  gap: 0.25rem;
+  /* 4px */
+}
+
+.gap-2 {
+  gap: 0.5rem;
+  /* 8px */
+}
+
+.gap-3 {
+  gap: 0.75rem;
+  /* 12px */
+}
+
+.gap-4 {
+  gap: 1rem;
+  /* 16px */
+}
+
+.gap-5 {
+  gap: 1.25rem;
+  /* 20px */
+}
+
+.gap-6 {
+  gap: 1.5rem;
+  /* 24px */
+}
+
+.gap-8 {
+  gap: 2rem;
+  /* 32px */
+}
+
+.gap-10 {
+  gap: 2.5rem;
+  /* 40px */
+}
+
+.gap-12 {
+  gap: 3rem;
+  /* 48px */
+}
+
+.h-full{
+  height: 100vh;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+  /* 4px */
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+  /* 8px */
+}
+.mb-4 {
+  margin-bottom: 1rem;
+  /* 16px */
+}
+.mb-8 {
+  margin-bottom: 2rem;
+  /* 32px */
+}
+
+.text-weanken{
+  color: #6c757d;
+}
