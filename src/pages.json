@@ -27,12 +27,6 @@
       }
     },
     {
-      "path": "pages/login/login",
-      "style": {
-        "navigationBarTitleText": "登录"
-      }
-    },
-    {
       "path": "pages/birthday/birthday",
       "style": {
         "navigationBarTitleText": "生日"
@@ -83,5 +77,26 @@
         "selectedIconPath": "static/tabs/user_selected.png"
       }
     ]
-  }
+  },
+  // 分包预下载规则
+  "preloadRule": {
+    "pages/birthday/birthday": {
+      "network": "all",
+      "packages": ["pagesBirthday"]
+    }
+  },
+  "subPackages": [
+    {
+      "root": "pagesBirthday",
+      "pages": [
+        {
+          "path": "add-birthday/add-birthday",
+          "style": {
+            "navigationBarTitleText": "添加生日提醒",
+            "backgroundColor": "#464646"
+          }
+        }
+      ]
+    }
+  ]
 }
