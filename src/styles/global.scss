@@ -1,3 +1,5 @@
+// 定义主题色
+$theme-color: #ff4b78;
 /* 布局 */
 .flex {
   display: flex;
@@ -270,6 +272,9 @@
 }
 
 /* Flex 容器中子元素的间距 */
+.gap-base{
+  gap:0.1rem;
+}
 .gap-1 {
   gap: 0.25rem;
   /* 4px */
@@ -345,13 +350,38 @@
 }
 
 .color-theme-bg{
-  background-color: #ff4b78;
+  background-color: $theme-color;
 }
 
 .color-theme {
-  color: #ff4b78;
+  color: $theme-color;
 }
 
 .text-light{
   color:#fff
+}
+
+.font-bolder{
+  font-weight: bolder;
+}
+
+.text-primary{
+  color: #000;
+}
+
+.text-weaken{
+  color: #6c757d;
+}
+
+.text-larger{
+  font-size: larger;
+}
+
+.items-end{
+  align-items: flex-end;
+}
+
+.text-link{
+  color: $theme-color;
+
 }

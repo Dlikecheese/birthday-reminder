@@ -49,17 +49,6 @@ import { http } from '@/utils/http'
 import { ref } from 'vue'
 import { Relation, RemindeType, Sex } from './type'
 
-const formData = ref({
-  name: '',
-  sex: '',
-  birthday: '',
-  phone: '',
-  remind: [RemindeType.ONE_DAY],
-  relation: '',
-  address: '',
-  comment: '',
-  tag: '',
-})
 const sexOptions = [
   { value: Sex.MALE, text: '男' },
   { value: Sex.FEMALE, text: '女' },
@@ -80,6 +69,18 @@ const relationOptions = [
   { value: Relation.CUSTOM, text: '客户' },
   { value: Relation.OTHER, text: '其他' },
 ]
+
+const formData = ref({
+  name: '',
+  sex: '',
+  birthday: '',
+  phone: '',
+  remindTime: [RemindeType.ONE_DAY],
+  relation: '',
+  address: '',
+  comment: '',
+  tag: '',
+})
 
 const rules = {
   name: {

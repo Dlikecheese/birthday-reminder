@@ -85,3 +85,12 @@ const login = async (code: string): Promise<UserInfo | undefined> => {
     return
   }
 }
+
+/** 计算生肖 */
+export function calculateZodiac(birthday: string): string {
+  const zodiacs: string[] = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪']
+  const year: number = new Date(birthday).getFullYear()
+  const baseYear: number = 1900
+  const index: number = (year - baseYear) % 12
+  return zodiacs[index]
+}
