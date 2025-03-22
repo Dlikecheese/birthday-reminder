@@ -1,39 +1,13 @@
 <template>
   <view v-if="birthdayList.length">
-    <uni-section title="一个月内生日">
+    <uni-section title="一个月内生日" type="line">
       <view v-if="birthdayLatestList.length">
-        <uni-card is-full v-for="item in birthdayLatestList" :key="item.id" :is-shadow="false">
-          <view class="flex justify-between">
-            <view class="flex gap-2">
-              <image src="@/static/images/avatar.png" mode="scaleToFill" class="avatar" />
-              <view class="flex flex-col gap-base">
-                <view class="text-primary font-bolder">{{ item.name }}</view>
-                <view>{{ item.desc }}</view>
-              </view>
-            </view>
-
-            <view class="flex flex-col gap-1 items-end">
-              <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
-              <view>距{{ item.age }}岁生日</view>
-            </view>
-          </view>
-        </uni-card>
-      </view>
-
-      <view v-else>
-        <view class="flex justify-center">
-          <view class="text-weaken">近期暂无生日</view>
-        </view>
-      </view>
-    </uni-section>
-
-    <uni-section title="一个月后过生日">
-      <view v-if="birthdayAfterOneMonthList.length">
         <uni-card
           is-full
-          v-for="item in birthdayAfterOneMonthList"
+          v-for="item in birthdayLatestList"
           :key="item.id"
           :is-shadow="false"
+          @click="onEdit(item.id)"
         >
           <view class="flex justify-between">
             <view class="flex gap-2">
@@ -46,7 +20,40 @@
 
             <view class="flex flex-col gap-1 items-end">
               <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
-              <view>距{{ item.age }}岁生日</view>
+              <view>距{{ item.nextAge }}岁生日</view>
+            </view>
+          </view>
+        </uni-card>
+      </view>
+
+      <view v-else>
+        <view class="flex justify-center">
+          <view class="text-weaken">近期暂无生日</view>
+        </view>
+      </view>
+    </uni-section>
+
+    <uni-section title="一个月后过生日" type="line">
+      <view v-if="birthdayAfterOneMonthList.length">
+        <uni-card
+          is-full
+          v-for="item in birthdayAfterOneMonthList"
+          :key="item.id"
+          :is-shadow="false"
+          @click="onEdit(item.id)"
+        >
+          <view class="flex justify-between">
+            <view class="flex gap-2">
+              <image src="@/static/images/avatar.png" mode="scaleToFill" class="avatar" />
+              <view class="flex flex-col gap-base">
+                <view class="text-primary font-bolder">{{ item.name }}</view>
+                <view>{{ item.desc }}</view>
+              </view>
+            </view>
+
+            <view class="flex flex-col gap-1 items-end">
+              <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
+              <view>距{{ item.nextAge }}岁生日</view>
             </view>
           </view>
         </uni-card>
@@ -73,6 +80,7 @@ import { calculateZodiac } from '@/utils/util'
 import { onShow } from '@dcloudio/uni-app'
 import dayjs from 'dayjs'
 import { ref } from 'vue'
+
 const addBirthday = () => {
   uni.navigateTo({
     url: '/pagesBirthday/add-birthday/add-birthday',
@@ -123,14 +131,14 @@ const getBirthdayList = async () => {
  */
 const transformBirthday = (birthdayList: any[]): any[] => {
   return birthdayList.map((ele) => {
-    const age = dayjs().diff(ele.birthday, 'year')
+    const nextAge = dayjs().diff(ele.birthday, 'year') + 1
     const zodiac = calculateZodiac(ele.birthday)
-    const desc = `${dayjs(ele.birthday).format('MM月DD日')} 属${zodiac} ${age}岁`
+    const desc = `${dayjs(ele.birthday).format('MM月DD日')} 属${zodiac} ${nextAge}岁`
 
     const countdown = calcCountdown(ele.birthday)
     return {
       ...ele,
-      age,
+      nextAge,
       desc,
       countdown,
     }
@@ -204,7 +212,11 @@ const getDiffText = (diff: number): string => {
   }
 }
 
-const onClick = () => {}
+const onEdit = (birthdayId: string): void => {
+  uni.navigateTo({
+    url: `/pagesBirthday/add-birthday/add-birthday?id=${birthdayId}`,
+  })
+}
 </script>
 
 <style lang="scss">

@@ -37,9 +37,12 @@
         <uni-easyinput v-model="formData.tag" type="text" placeholder="请输入个性标签" />
       </uni-forms-item>
     </uni-forms>
-    <view class="box">1</view>
-    <view class="submit">
-      <button @click="submit" class="submit-btn color-theme-bg text-light">添加</button>
+    <view class="box"></view>
+    <view class="submit flex">
+      <uni-icons type="trash" size="30" color="#9e9e9e" v-if="birthdayId" @click="remove" />
+      <button @click="submit" class="submit-btn color-theme-bg text-light">
+        {{ birthdayId ? '修改' : '添加' }}
+      </button>
     </view>
   </div>
 </template>
@@ -48,6 +51,22 @@
 import { http } from '@/utils/http'
 import { ref } from 'vue'
 import { Relation, RemindeType, Sex } from './type'
+import { onLoad } from '@dcloudio/uni-app'
+
+let birthdayId = ref('')
+onLoad(({ id }: any) => {
+  if (id) {
+    uni.setNavigationBarTitle({
+      title: '编辑生日提醒',
+    })
+
+    birthdayId.value = id
+    console.log(id)
+
+    // 获取生日详情
+    getBirthdayDetail(id)
+  }
+})
 
 const sexOptions = [
   { value: Sex.MALE, text: '男' },
@@ -130,6 +149,23 @@ const submit = async () => {
   try {
     const val = await formRef.value?.validate()
 
+    if (birthdayId.value) {
+      await http({
+        url: '/birthday',
+        method: 'PUT',
+        data: {
+          ...val,
+          id: birthdayId.value,
+        },
+      })
+      uni.showToast({
+        title: '编辑成功',
+        icon: 'success',
+      })
+      uni.navigateBack()
+      return
+    }
+
     await http({
       url: '/birthday',
       method: 'POST',
@@ -142,10 +178,55 @@ const submit = async () => {
     uni.navigateBack()
   } catch (error) {
     uni.showToast({
-      title: '添加失败',
+      title: '操作失败',
       icon: 'error',
     })
   }
+}
+
+const getBirthdayDetail = async (id: string) => {
+  // 获取生日详情
+  try {
+    const res: any = await http({
+      url: '/birthday/' + id,
+      method: 'GET',
+    })
+
+    // 设置表单数据
+    formData.value = res.data
+  } catch (e) {
+    uni.showToast({
+      title: '获取生日详情失败',
+      icon: 'error',
+    })
+  }
+}
+
+const remove = () => {
+  uni.showModal({
+    title: '提示',
+    content: '确定删除该生日提醒吗？',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          await http({
+            url: '/birthday/' + birthdayId.value,
+            method: 'DELETE',
+          })
+          uni.showToast({
+            title: '删除成功',
+            icon: 'success',
+          })
+          uni.navigateBack()
+        } catch (e) {
+          uni.showToast({
+            title: '删除失败',
+            icon: 'error',
+          })
+        }
+      }
+    },
+  })
 }
 </script>
 
@@ -158,6 +239,7 @@ const submit = async () => {
   border-top: 1px solid #f2f2f2;
   padding: 10px 10px 0;
   background-color: #fff;
+  align-items: center;
   z-index: 98;
   .submit-btn {
     width: 80%;
@@ -165,5 +247,7 @@ const submit = async () => {
 }
 .box {
   margin-bottom: 24px;
+  width: 100%;
+  height: 50px;
 }
 </style>
