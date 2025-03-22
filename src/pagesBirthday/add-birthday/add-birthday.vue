@@ -162,6 +162,13 @@ const submit = async () => {
         title: '编辑成功',
         icon: 'success',
       })
+
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve('')
+        }, 200)
+      })
+
       uni.navigateBack()
       return
     }
@@ -171,9 +178,15 @@ const submit = async () => {
       method: 'POST',
       data: val,
     })
+
     uni.showToast({
       title: '添加成功',
       icon: 'success',
+    })
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('')
+      }, 200)
     })
     uni.navigateBack()
   } catch (error) {

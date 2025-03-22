@@ -2,28 +2,31 @@
   <view v-if="birthdayList.length">
     <uni-section title="一个月内生日" type="line">
       <view v-if="birthdayLatestList.length">
-        <uni-card
-          is-full
-          v-for="item in birthdayLatestList"
-          :key="item.id"
-          :is-shadow="false"
-          @click="onEdit(item.id)"
-        >
-          <view class="flex justify-between">
-            <view class="flex gap-2">
-              <image src="@/static/images/avatar.png" mode="scaleToFill" class="avatar" />
-              <view class="flex flex-col gap-base">
-                <view class="text-primary font-bolder">{{ item.name }}</view>
-                <view>{{ item.desc }}</view>
-              </view>
-            </view>
+        <uni-swipe-action>
+          <uni-swipe-action-item
+            v-for="item in birthdayLatestList"
+            :key="item.id"
+            :right-options="item.options"
+            @click="swipeClick($event, item)"
+          >
+            <uni-card is-full :is-shadow="false" @click="onEdit(item.id)">
+              <view class="flex justify-between">
+                <view class="flex gap-2">
+                  <image src="@/static/images/avatar.png" mode="scaleToFill" class="avatar" />
+                  <view class="flex flex-col gap-base">
+                    <view class="text-primary font-bolder">{{ item.name }}</view>
+                    <view>{{ item.desc }}</view>
+                  </view>
+                </view>
 
-            <view class="flex flex-col gap-1 items-end">
-              <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
-              <view>距{{ item.nextAge }}岁生日</view>
-            </view>
-          </view>
-        </uni-card>
+                <view class="flex flex-col gap-1 items-end">
+                  <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
+                  <view>距{{ item.nextAge }}岁生日</view>
+                </view>
+              </view>
+            </uni-card>
+          </uni-swipe-action-item>
+        </uni-swipe-action>
       </view>
 
       <view v-else>
@@ -35,28 +38,31 @@
 
     <uni-section title="一个月后过生日" type="line">
       <view v-if="birthdayAfterOneMonthList.length">
-        <uni-card
-          is-full
-          v-for="item in birthdayAfterOneMonthList"
-          :key="item.id"
-          :is-shadow="false"
-          @click="onEdit(item.id)"
-        >
-          <view class="flex justify-between">
-            <view class="flex gap-2">
-              <image src="@/static/images/avatar.png" mode="scaleToFill" class="avatar" />
-              <view class="flex flex-col gap-base">
-                <view class="text-primary font-bolder">{{ item.name }}</view>
-                <view>{{ item.desc }}</view>
-              </view>
-            </view>
+        <uni-swipe-action>
+          <uni-swipe-action-item
+            v-for="item in birthdayAfterOneMonthList"
+            :key="item.id"
+            :right-options="item.options"
+            @click="swipeClick($event, item)"
+          >
+            <uni-card is-full :is-shadow="false" @click="onEdit(item.id)">
+              <view class="flex justify-between">
+                <view class="flex gap-2">
+                  <image src="@/static/images/avatar.png" mode="scaleToFill" class="avatar" />
+                  <view class="flex flex-col gap-base">
+                    <view class="text-primary font-bolder">{{ item.name }}</view>
+                    <view>{{ item.desc }}</view>
+                  </view>
+                </view>
 
-            <view class="flex flex-col gap-1 items-end">
-              <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
-              <view>距{{ item.nextAge }}岁生日</view>
-            </view>
-          </view>
-        </uni-card>
+                <view class="flex flex-col gap-1 items-end">
+                  <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
+                  <view>距{{ item.nextAge }}岁生日</view>
+                </view>
+              </view>
+            </uni-card>
+          </uni-swipe-action-item>
+        </uni-swipe-action>
       </view>
 
       <view v-else>
@@ -90,6 +96,15 @@ const addBirthday = () => {
 const birthdayList = ref([]) as any
 const birthdayLatestList = ref([]) as any
 const birthdayAfterOneMonthList = ref([]) as any
+const swipeAction = [
+  {
+    id: 'delete',
+    text: '删除',
+    style: {
+      backgroundColor: '#F56C6C',
+    },
+  },
+]
 
 onShow(() => {
   getBirthdayList()
@@ -141,6 +156,7 @@ const transformBirthday = (birthdayList: any[]): any[] => {
       nextAge,
       desc,
       countdown,
+      options: swipeAction,
     }
   })
 }
@@ -216,6 +232,37 @@ const onEdit = (birthdayId: string): void => {
   uni.navigateTo({
     url: `/pagesBirthday/add-birthday/add-birthday?id=${birthdayId}`,
   })
+}
+
+const swipeClick = (e: any, item: any) => {
+  if (e.content.id === 'delete') {
+    uni.showModal({
+      title: '提示',
+      content: `确定删除${item.name}的生日提醒吗？`,
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await http({
+              url: `/birthday/${item.id}`,
+              method: 'DELETE',
+            })
+            uni.showToast({
+              title: '删除成功',
+              icon: 'success',
+            })
+            getBirthdayList()
+          } catch (e) {
+            uni.showToast({
+              title: '删除失败',
+              icon: 'error',
+            })
+          }
+        } else if (res.cancel) {
+          console.log(' 已取消删除')
+        }
+      },
+    })
+  }
 }
 </script>
 
