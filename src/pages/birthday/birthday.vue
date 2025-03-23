@@ -1,5 +1,5 @@
 <template>
-  <view v-if="birthdayList.length">
+  <view v-if="!loading && birthdayList.length">
     <uni-section title="一个月内生日" type="line">
       <view v-if="birthdayLatestList.length">
         <uni-swipe-action>
@@ -73,7 +73,7 @@
     </uni-section>
   </view>
 
-  <view v-else class="no-data text-weaken">
+  <view v-else-if="!loading && !birthdayList.length" class="no-data text-weaken">
     快去添加生日吧~ <text class="text-link link" @click="addBirthday">去添加</text>
   </view>
 
@@ -105,9 +105,19 @@ const swipeAction = [
     },
   },
 ]
+const loading = ref(false)
 
-onShow(() => {
-  getBirthdayList()
+onShow(async () => {
+  loading.value = true
+  uni.showLoading({
+    title: '加载中',
+  })
+  try {
+    await getBirthdayList()
+  } finally {
+    uni.hideLoading()
+    loading.value = false
+  }
 })
 
 const getBirthdayList = async () => {
@@ -258,7 +268,10 @@ const swipeClick = (e: any, item: any) => {
             })
           }
         } else if (res.cancel) {
-          console.log(' 已取消删除')
+          uni.showToast({
+            title: '已取消删除',
+            icon: 'none',
+          })
         }
       },
     })

@@ -54,17 +54,21 @@ import { Relation, RemindeType, Sex } from './type'
 import { onLoad } from '@dcloudio/uni-app'
 
 let birthdayId = ref('')
-onLoad(({ id }: any) => {
+onLoad(async ({ id }: any) => {
   if (id) {
     uni.setNavigationBarTitle({
       title: '编辑生日提醒',
     })
 
     birthdayId.value = id
-    console.log(id)
 
     // 获取生日详情
-    getBirthdayDetail(id)
+    uni.showLoading({
+      title: '加载中',
+      mask: true,
+    })
+    await getBirthdayDetail(id)
+    uni.hideLoading()
   }
 })
 

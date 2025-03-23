@@ -22,10 +22,14 @@ onTabItemTap(async () => {
 
 const checkLogin = async () => {
   if (!isLogin()) {
-    const userInfo = await toLogin()
+    try {
+      const userInfo = await toLogin()
 
-    if (!userInfo) {
-      authPopupRef.value?.openPopup?.()
+      if (!userInfo) {
+        authPopupRef.value?.openPopup?.()
+      }
+    } catch (error) {
+      console.error(error)
     }
   }
 }
