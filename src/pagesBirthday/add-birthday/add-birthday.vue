@@ -50,8 +50,9 @@
 <script lang="ts" setup>
 import { http } from '@/utils/http'
 import { ref } from 'vue'
-import { Relation, RemindeType, Sex } from './type'
+import { Relation, RemindeType } from './add-birthday.type'
 import { onLoad } from '@dcloudio/uni-app'
+import { Sex } from '@/types/common'
 
 let birthdayId = ref('')
 onLoad(async ({ id }: any) => {

@@ -10,11 +10,6 @@ export enum Relation {
   OTHER = 'OTHER',
 }
 
-export enum Sex {
-  MALE = 'MAIL',
-  FEMALE = 'FEMALE',
-}
-
 /** 提醒时间类型 */
 export enum RemindeType {
   ONE_DAY = 'ONE_DAY',

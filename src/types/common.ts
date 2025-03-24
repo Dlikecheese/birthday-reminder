@@ -4,3 +4,8 @@ export interface UserInfo {
   id: string
   token: string
 }
+
+export enum Sex {
+  MALE = 'MAIL',
+  FEMALE = 'FEMALE',
+}

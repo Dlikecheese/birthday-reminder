@@ -83,6 +83,10 @@
     "pages/birthday/birthday": {
       "network": "all",
       "packages": ["pagesBirthday"]
+    },
+    "pages/gift/gift": {
+      "network": "all",
+      "packages": ["pagesGift"]
     }
   },
   "subPackages": [
@@ -94,6 +98,17 @@
           "style": {
             "navigationBarTitleText": "添加生日提醒",
             "backgroundColor": "#464646"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pagesGift",
+      "pages": [
+        {
+          "path": "add-gift/add-gift",
+          "style": {
+            "navigationBarTitleText": "添加礼物"
           }
         }
       ]
