@@ -4,17 +4,18 @@
       <uni-forms-item label="礼物名" name="name">
         <uni-easyinput type="text" v-model="formData.name" placeholder="请输入礼物名" />
       </uni-forms-item>
-      <uni-forms-item label="描述" name="desc">
-        <uni-easyinput type="textarea" v-model="formData.desc" placeholder="请输入礼物描述" />
+      <uni-forms-item label="描述" name="description">
+        <uni-easyinput
+          type="textarea"
+          v-model="formData.description"
+          placeholder="请输入礼物描述"
+        />
       </uni-forms-item>
-      <uni-forms-item label="适用性别" name="usage_sex">
-        <uni-data-select v-model="formData.usage_sex" :localdata="sexOptions"></uni-data-select>
+      <uni-forms-item label="适用性别" name="usageSex">
+        <uni-data-select v-model="formData.usageSex" :localdata="sexOptions"></uni-data-select>
       </uni-forms-item>
-      <uni-forms-item label="适用年龄段" name="usage_age">
-        <uni-data-select
-          v-model="formData.usage_age"
-          :localdata="usageAgeOptions"
-        ></uni-data-select>
+      <uni-forms-item label="适用年龄段" name="usageAge">
+        <uni-data-select v-model="formData.usageAge" :localdata="usageAgeOptions"></uni-data-select>
       </uni-forms-item>
     </uni-forms>
 
@@ -64,21 +65,19 @@ const sexOptions = [
 ]
 const usageAgeOptions = [
   { value: 'all', text: '通用' },
-  { value: '0-3', text: '0-3岁' },
-  { value: '3-6', text: '3-6岁' },
-  { value: '6-12', text: '6-12岁' },
-  { value: '12-18', text: '12-18岁' },
-  { value: '18-30', text: '18-30岁' },
-  { value: '30-50', text: '30-50岁' },
-  { value: '50-70', text: '50-70岁' },
-  { value: '70-100', text: '70-100岁' },
+  { value: '0', text: '婴幼儿' },
+  { value: '1', text: '童年' },
+  { value: '2', text: '少年' },
+  { value: '3', text: '青年' },
+  { value: '4', text: '中年' },
+  { value: '5', text: '老年' },
 ]
 
 const formData = ref({
   name: '',
-  desc: '',
-  usage_sex: 'all',
-  usage_age: 'all',
+  description: '',
+  usageSex: 'all',
+  usageAge: 'all',
   img: '',
 })
 
@@ -100,7 +99,7 @@ const rules = {
     label: '礼物名',
     validateTrigger: 'submit',
   },
-  desc: {
+  description: {
     rules: [
       {
         minLength: 1,
