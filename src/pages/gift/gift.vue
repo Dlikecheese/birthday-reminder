@@ -32,7 +32,7 @@
               v-if="item.isFavoritedByUser"
               type="heart-filled"
               size="18"
-              color="#999"
+              color="#eb414a"
               @click="onLike(item)"
             />
             <uni-icons v-else type="heart" size="18" color="#999" @click="onLike(item)" />
@@ -41,7 +41,7 @@
               v-if="item.isCollectedByUser"
               type="star-filled"
               size="20"
-              color="#999"
+              color="#eb414a"
               @click="onCollect(item)"
             />
             <uni-icons v-else type="star" size="20" color="#999" @click="onCollect(item)" />
