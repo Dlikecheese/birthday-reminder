@@ -171,7 +171,7 @@ const getBirthdayDetail = async (id: string) => {
   // 获取礼物详情
   try {
     const res: any = await http({
-      url: '/gift/' + id,
+      url: '/gift/detail/' + id,
       method: 'GET',
     })
 

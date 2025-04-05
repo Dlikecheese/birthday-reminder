@@ -6,6 +6,6 @@ export enum GiftType {
   ALL = 0,
   /** 我创建的礼物 */
   OWN = 1,
-  /** 我喜欢的礼物 */
-  LIKE = 2,
+  /** 我收藏的礼物 */
+  COLLECT = 2,
 }

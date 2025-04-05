@@ -19,6 +19,7 @@
       padding="0"
       margin="0"
       :is-shadow="false"
+      @click="toDetail(item, $event)"
     >
       <view class="waterfall-item-title">{{ item.name }}</view>
       <template v-slot:actions>
@@ -41,7 +42,7 @@
               v-if="item.isCollectedByUser"
               type="star-filled"
               size="20"
-              color="#eb414a"
+              color="#f38f66"
               @click="onCollect(item)"
             />
             <uni-icons v-else type="star" size="20" color="#999" @click="onCollect(item)" />
@@ -90,7 +91,20 @@ onShow(() => {
   refreshList(current.value)
 })
 
+const toDetail = (item: any, e: string) => {
+  if (e === 'actions') {
+    return
+  }
+  // 存储数据
+  uni.setStorageSync('gift', item)
+  uni.navigateTo({
+    url: `/pagesGift/gift-detail/gift-detail?id=${item.id}`,
+  })
+}
+
 const onClickTab = ({ currentIndex }: any) => {
+  current.value = currentIndex
+
   refreshList(currentIndex)
 }
 
@@ -112,7 +126,7 @@ const refreshList = async (currentTab: GiftType) => {
     })
   }
 
-  if (currentTab === GiftType.LIKE) {
+  if (currentTab === GiftType.COLLECT) {
     res = await getGfitList({
       start: 0,
       pageSize: defaultPageSize,
@@ -179,7 +193,9 @@ const onCollect = async (item: any) => {
     item.collectCount += 1
   } else {
     item.collectCount -= 1
-    displayedList.value.splice(displayedList.value.indexOf(item), 1)
+    if (current.value === GiftType.COLLECT) {
+      displayedList.value.splice(displayedList.value.indexOf(item), 1)
+    }
   }
 }
 </script>
