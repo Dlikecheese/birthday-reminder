@@ -64,9 +64,9 @@ const operations = [
   {
     label: '我的信息',
     click: () => {
-      uni.navigateTo({
-        url: '/pages/myInfo/myInfo',
-      })
+      // uni.navigateTo({
+      //   url: '/pages/myInfo/myInfo',
+      // })
     },
     id: 'info',
   },
