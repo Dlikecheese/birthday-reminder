@@ -59,25 +59,54 @@ const logout = async () => {
     icon: 'success',
   })
 }
+
+const operations = [
+  {
+    label: '我的信息',
+    click: () => {
+      uni.navigateTo({
+        url: '/pages/myInfo/myInfo',
+      })
+    },
+    id: 'info',
+  },
+  {
+    label: '提个意见',
+    click: () => {
+      uni.navigateTo({
+        url: '/pagesMy/feedback/feedback',
+      })
+    },
+    id: 'feedback',
+  },
+]
 </script>
 
 <template>
-  <view class="flex items-center gap-2 p-2" v-if="!isLogin">
-    <!-- <view>会员信息：{{ userStore.profile }}</view>
+  <uni-card class="header">
+    <view class="flex items-center gap-2 p-2" v-if="!isLogin">
+      <image :src="displayedAvatarUrl" class="avatar" />
+      <view class="cursor-point text-light" @click="login">请点击登录</view>
+    </view>
 
-    <button @tap="userStore.clearProfile()" size="mini" plain type="warn">清理用户信息</button> -->
-    <image :src="displayedAvatarUrl" class="avatar" />
-    <view class="cursor-point text-weanken" @click="login">请点击登录</view>
-  </view>
+    <view v-else class="flex flex-col justify-between">
+      <view class="flex items-center justify-between gap-2 p-2">
+        <view class="flex items-center gap-2">
+          <image :src="displayedAvatarUrl" class="avatar" />
+          <view class="username">{{ displayedName }}</view>
+        </view>
 
-  <view v-else class="flex flex-col justify-between h-full">
-    <view class="flex items-center justify-between gap-2 p-2">
-      <view class="flex items-center gap-2">
-        <image :src="displayedAvatarUrl" class="avatar" />
-        <view>{{ displayedName }}</view>
+        <image src="@/static/images/logout.svg" class="logout" @click="logout" />
       </view>
+    </view>
+  </uni-card>
 
-      <image src="@/static/images/logout.svg" class="logout" @click="logout" />
+  <view class="operation-wrap" v-if="isLogin">
+    <view v-for="item in operations" :key="item.id" class="operation-item-wrap" @click="item.click">
+      <view class="flex items-center justify-between">
+        <view class="left">{{ item.label }}</view>
+        <view class="right" @click="item.click">></view>
+      </view>
     </view>
   </view>
 
@@ -88,6 +117,11 @@ const logout = async () => {
 .avatar {
   width: 50px;
   height: 50px;
+  border-radius: 50%;
+}
+
+.username {
+  color: #fff;
 }
 
 .cursor-point {
@@ -99,6 +133,31 @@ const logout = async () => {
   height: 20px;
   margin-right: 10px;
 }
-</style>
 
-function wxLogin(arg0: () => void) { throw new Error('Function not implemented.') }
+.header {
+  ::v-deep .uni-card {
+    background-color: #ff4b78 !important;
+  }
+}
+
+.operation-wrap {
+  background-color: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  margin: 15px;
+  .operation-item-wrap {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    .left {
+      color: #333;
+    }
+    .right {
+      color: #999;
+    }
+  }
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+</style>
