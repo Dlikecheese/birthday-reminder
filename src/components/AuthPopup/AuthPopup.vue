@@ -1,7 +1,11 @@
 <template>
   <uni-popup ref="popupRef" type="bottom" border-radius="10px 10px 0 0">
     <view class="popup-wrap">
-      <view class="popup-wrap-header">申请获取您的头像、昵称</view>
+      <view class="popup-wrap-header">申请权限</view>
+      <view class="text-weanken"
+        >使用本小程序需要授权微信名称、头像。其他权限包括照片，地址和手机号等。详情查看
+        <a @click="toAggreementPage" class="aggreement">《隐私政策》</a></view
+      >
       <!-- 头像 -->
       <view class="row-item">
         <view class="col">头像：</view>
@@ -108,6 +112,10 @@ const closePopup = (): void => {
 defineExpose({
   openPopup,
 })
+
+const toAggreementPage = () => {
+  uni.navigateTo({ url: '/pagesMy/aggreement/aggreement' })
+}
 </script>
 
 <style lang="scss">
@@ -158,5 +166,9 @@ defineExpose({
     width: 50px;
     height: 50px;
   }
+}
+
+.aggreement {
+  color: #ff4b78;
 }
 </style>

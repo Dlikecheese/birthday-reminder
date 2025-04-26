@@ -14,7 +14,7 @@
       v-for="item in displayedList"
       :key="item.id"
       class="waterfall-item"
-      :cover="cover"
+      :cover="item.image"
       :border="false"
       padding="0"
       margin="0"
@@ -55,14 +55,36 @@
 
   <!-- 创建 -->
   <uni-icons type="plus" color="#ff6e95" size="40" class="icon" @click="addGift" />
+
+  <AuthPopup ref="authPopupRef" />
 </template>
 
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
 import { GiftType } from './gift.type'
-import cover from '@/static/images/test.jpg'
 import { http } from '@/utils/http'
 import { onReachBottom, onShow } from '@dcloudio/uni-app'
+import { isLogin, toLogin } from '@/utils/util'
+
+const authPopupRef = ref(null) as any
+
+onShow(async () => {
+  await checkLogin()
+})
+
+const checkLogin = async () => {
+  if (!isLogin()) {
+    try {
+      const userInfo = await toLogin()
+
+      if (!userInfo) {
+        authPopupRef.value?.openPopup?.()
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
 
 const items = ref(['礼物广场', '我创建的', '我收藏的']) as Ref<string[]>
 const current = ref(GiftType.ALL) as Ref<GiftType>

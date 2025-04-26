@@ -12,7 +12,11 @@
             <uni-card is-full :is-shadow="false" @click="onEdit(item.id)">
               <view class="flex justify-between">
                 <view class="flex gap-2">
-                  <image src="@/static/images/avatar.png" mode="scaleToFill" class="avatar" />
+                  <image
+                    src="@/static/images/default-avatar.jpeg"
+                    mode="scaleToFill"
+                    class="avatar"
+                  />
                   <view class="flex flex-col gap-base">
                     <view class="text-primary font-bolder">{{ item.name }}</view>
                     <view>{{ item.desc }}</view>
@@ -48,7 +52,11 @@
             <uni-card is-full :is-shadow="false" @click="onEdit(item.id)">
               <view class="flex justify-between">
                 <view class="flex gap-2">
-                  <image src="@/static/images/avatar.png" mode="scaleToFill" class="avatar" />
+                  <image
+                    src="@/static/images/default-avatar.jpeg"
+                    mode="scaleToFill"
+                    class="avatar"
+                  />
                   <view class="flex flex-col gap-base">
                     <view class="text-primary font-bolder">{{ item.name }}</view>
                     <view>{{ item.desc }}</view>
@@ -78,15 +86,35 @@
   </view>
 
   <uni-icons type="plus" color="#ff6e95" size="40" class="icon" @click="addBirthday" />
+
+  <AuthPopup ref="authPopupRef" />
 </template>
 
 <script lang="ts" setup>
 import { http } from '@/utils/http'
-import { calculateZodiac } from '@/utils/util'
+import { calculateZodiac, isLogin, toLogin } from '@/utils/util'
 import { onShow } from '@dcloudio/uni-app'
 import dayjs from 'dayjs'
 import { ref } from 'vue'
 
+const authPopupRef = ref(null) as any
+
+onShow(async () => {
+  await checkLogin()
+})
+const checkLogin = async () => {
+  if (!isLogin()) {
+    try {
+      const userInfo = await toLogin()
+
+      if (!userInfo) {
+        authPopupRef.value?.openPopup?.()
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
 const addBirthday = () => {
   uni.navigateTo({
     url: '/pagesBirthday/add-birthday/add-birthday',

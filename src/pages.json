@@ -121,6 +121,12 @@
           "style": {
             "navigationBarTitleText": "feedback"
           }
+        },
+        {
+          "path": "aggreement/aggreement",
+          "style": {
+            "navigationBarTitleText": "隐私协议"
+          }
         }
       ]
     }

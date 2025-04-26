@@ -9,7 +9,7 @@
   <uni-card
     :key="gift.id"
     class="gift-wrap"
-    :cover="cover"
+    :cover="gift.image"
     :border="false"
     padding="0"
     margin="0"
@@ -51,7 +51,6 @@
 </template>
 
 <script lang="ts" setup>
-import cover from '@/static/images/test.jpg'
 import { http } from '@/utils/http'
 import { ref, type Ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
