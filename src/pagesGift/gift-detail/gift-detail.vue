@@ -7,6 +7,7 @@
     <uni-icons type="more-filled" @click="onMoreAction" />
   </view>
   <uni-card
+    v-if="gift.image"
     :key="gift.id"
     class="gift-wrap"
     :cover="gift.image"
@@ -18,6 +19,18 @@
     <view class="gift-wrap-title">{{ gift.name }}</view>
     <view class="gift-wrap-desc">{{ gift.description }}</view>
   </uni-card>
+
+  <view v-else>
+    <view class="default-cover">
+      <text>
+        {{ gift.name?.slice(0, maxFontLen) }}
+        <text v-if="gift.name?.length > maxFontLen">...</text>
+      </text>
+    </view>
+    <view class="gift-wrap-title">{{ gift.name }}</view>
+    <view class="gift-wrap-desc">{{ gift.description }}</view>
+  </view>
+
   <view class="card-actions text-weaken">
     <view></view>
     <view class="card-actions-item">
@@ -55,6 +68,9 @@ import { http } from '@/utils/http'
 import { ref, type Ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 
+// 最长显示文字长度
+const maxFontLen = 100
+
 let giftId = ref('')
 let gift: Ref<any> = ref({})
 onLoad(async ({ id }: any) => {
@@ -66,9 +82,10 @@ onLoad(async ({ id }: any) => {
       mask: true,
     })
     const value = uni.getStorageSync('gift')
-    console.log(value)
 
-    gift.value = { ...value }
+    gift.value = {
+      ...value,
+    }
     await getBirthdayDetail(id)
     uni.hideLoading()
   }
@@ -179,9 +196,9 @@ const onDelete = () => {
 }
 .gift-wrap-title {
   font-size: 16px;
-  font-weight: bold;
   padding: 10px;
   color: #000;
+  margin-bottom: 50px;
 }
 .gift-wrap-desc {
   font-size: 14px;
@@ -230,5 +247,19 @@ const onDelete = () => {
   border-radius: 50%;
   margin-right: 4px;
   object-fit: cover;
+}
+
+.default-cover {
+  width: 100vw;
+  height: 80vh;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 20px;
+  font-weight: 600;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

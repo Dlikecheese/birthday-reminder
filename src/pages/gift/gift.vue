@@ -10,18 +10,21 @@
   </view>
   <!-- 图片列表 -->
   <view class="waterfall-container">
-    <uni-card
+    <br-card
       v-for="item in displayedList"
+      :item="item"
       :key="item.id"
       class="waterfall-item"
-      :cover="item.image"
-      :border="false"
-      padding="0"
-      margin="0"
-      :is-shadow="false"
-      @click="toDetail(item, $event)"
+      @click="toDetail(item)"
     >
-      <view class="waterfall-item-title">{{ item.name }}</view>
+      <template v-slot:title>
+        <view class="waterfall-item-title"
+          ><text>
+            {{ item.name?.slice(0, maxFontLen) }}
+            <text v-if="item.name?.length > maxFontLen">...</text>
+          </text></view
+        >
+      </template>
       <template v-slot:actions>
         <view class="card-actions text-weaken">
           <view class="card-actions-item">
@@ -32,25 +35,18 @@
             <uni-icons
               v-if="item.isFavoritedByUser"
               type="heart-filled"
-              size="18"
+              size="16"
               color="#eb414a"
-              @click="onLike(item)"
             />
-            <uni-icons v-else type="heart" size="18" color="#999" @click="onLike(item)" />
+            <uni-icons v-else type="heart" size="16" color="#999" />
             <text>{{ item.favoriteCount ?? 0 }}</text>
-            <uni-icons
-              v-if="item.isCollectedByUser"
-              type="star-filled"
-              size="20"
-              color="#f38f66"
-              @click="onCollect(item)"
-            />
-            <uni-icons v-else type="star" size="20" color="#999" @click="onCollect(item)" />
+            <uni-icons v-if="item.isCollectedByUser" type="star-filled" size="20" color="#f38f66" />
+            <uni-icons v-else type="star" size="20" color="#999" />
             <text>{{ item.collectCount ?? 0 }}</text>
           </view>
         </view>
       </template>
-    </uni-card>
+    </br-card>
   </view>
 
   <!-- 创建 -->
@@ -60,12 +56,12 @@
 </template>
 
 <script lang="ts" setup>
+const maxFontLen = 18
 import { ref, type Ref } from 'vue'
 import { GiftType } from './gift.type'
 import { http } from '@/utils/http'
 import { onReachBottom, onShow } from '@dcloudio/uni-app'
 import { isLogin, toLogin } from '@/utils/util'
-
 const authPopupRef = ref(null) as any
 
 onShow(async () => {
@@ -113,10 +109,7 @@ onShow(() => {
   refreshList(current.value)
 })
 
-const toDetail = (item: any, e: string) => {
-  if (e === 'actions') {
-    return
-  }
+const toDetail = (item: any) => {
   // 存储数据
   uni.setStorageSync('gift', item)
   uni.navigateTo({
@@ -189,37 +182,6 @@ const addGift = () => {
     url: '/pagesGift/add-gift/add-gift',
   })
 }
-
-const onLike = async (item: any) => {
-  await http({
-    url: `/gift/like/${item.id}/${!item.isFavoritedByUser}`,
-    method: 'POST',
-  })
-  item.isFavoritedByUser = !item.isFavoritedByUser
-
-  if (item.isFavoritedByUser) {
-    item.favoriteCount += 1
-  } else {
-    item.favoriteCount -= 1
-  }
-}
-
-const onCollect = async (item: any) => {
-  await http({
-    url: `/gift/collect/${item.id}/${!item.isCollectedByUser}`,
-    method: 'POST',
-  })
-  item.isCollectedByUser = !item.isCollectedByUser
-
-  if (item.isCollectedByUser) {
-    item.collectCount += 1
-  } else {
-    item.collectCount -= 1
-    if (current.value === GiftType.COLLECT) {
-      displayedList.value.splice(displayedList.value.indexOf(item), 1)
-    }
-  }
-}
 </script>
 
 <style lang="scss" scoped>
@@ -247,15 +209,21 @@ const onCollect = async (item: any) => {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
+  background-color: #fafafa;
+  padding: 2px 0 4px 4px;
 }
 
 .waterfall-item {
-  flex: 1 1 50%; /* 两列布局 */
-  max-width: 50%;
+  flex: 1 1 49%; /* 两列布局 */
+  max-width: 49%;
+  background-color: #fff;
+  margin: 2px 1px 2px 2px;
+  background-color: #fff;
 }
 .waterfall-item-title {
   color: #000;
   padding: 4px 10px 0 10px;
+  font-size: 14px;
 }
 .card-actions {
   display: flex;
@@ -263,6 +231,7 @@ const onCollect = async (item: any) => {
   justify-content: space-between;
   align-items: center;
   padding: 5px 10px;
+  font-size: 12px;
 }
 .card-actions-item {
   display: flex;
