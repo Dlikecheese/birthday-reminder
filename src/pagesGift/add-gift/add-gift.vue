@@ -121,7 +121,7 @@ const submit = async () => {
 
     if (giftId.value) {
       await http({
-        url: '/gift',
+        url: `/gift/${giftId.value}`,
         method: 'PUT',
         data: {
           ...val,

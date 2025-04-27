@@ -4,7 +4,7 @@
       <image class="avatar" :src="gift.creatorAvatar" />
       <text>{{ gift.creatorName }}</text>
     </view>
-    <uni-icons type="more-filled" @click="onMoreAction" />
+    <uni-icons v-if="gift.isMine" type="more-filled" @click="onMoreAction" />
   </view>
   <uni-card
     v-if="gift.image"
@@ -66,7 +66,7 @@
 <script lang="ts" setup>
 import { http } from '@/utils/http'
 import { ref, type Ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 
 // 最长显示文字长度
 const maxFontLen = 100
@@ -86,9 +86,19 @@ onLoad(async ({ id }: any) => {
     gift.value = {
       ...value,
     }
+
     await getBirthdayDetail(id)
     uni.hideLoading()
   }
+})
+
+onShow(async () => {
+  uni.showLoading({
+    title: '加载中',
+    mask: true,
+  })
+  await getBirthdayDetail(giftId.value)
+  uni.hideLoading()
 })
 const getBirthdayDetail = async (id: string) => {
   // 获取礼物详情
@@ -101,6 +111,9 @@ const getBirthdayDetail = async (id: string) => {
     gift.value = {
       ...gift.value,
       description: res.data.description,
+      isMine: res.data.isMine,
+      name: res.data.name,
+      image: res.data.image,
     }
   } catch (e) {
     uni.showToast({
@@ -163,11 +176,14 @@ const onDelete = () => {
             url: `/gift/${gift.value.id}`,
             method: 'DELETE',
           })
-          uni.showToast({
-            title: '删除成功',
-            icon: 'success',
-          })
-          uni.navigateBack()
+          setTimeout(() => {
+            uni.showToast({
+              title: '删除成功',
+              icon: 'success',
+            })
+
+            uni.navigateBack()
+          }, 800)
         } catch (e) {
           uni.showToast({
             title: '删除失败',
