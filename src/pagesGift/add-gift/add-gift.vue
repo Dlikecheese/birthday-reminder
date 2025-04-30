@@ -78,7 +78,7 @@ const formData = ref({
   description: '',
   usageSex: 'all',
   usageAge: 'all',
-  img: '',
+  image: '',
 })
 
 const rules = {
@@ -126,6 +126,7 @@ const submit = async () => {
         data: {
           ...val,
           id: giftId.value,
+          image: formData.value.image,
         },
       })
       uni.showToast({
@@ -146,7 +147,10 @@ const submit = async () => {
     await http({
       url: '/gift',
       method: 'POST',
-      data: val,
+      data: {
+        ...val,
+        image: formData.value.image,
+      },
     })
 
     uni.showToast({
@@ -225,7 +229,7 @@ const select = (e: any) => {
     success: (res: any) => {
       try {
         const data = JSON.parse(res.data)
-        formData.value.img = data.data
+        formData.value.image = data.data
       } catch (e) {
         uni.showToast({
           title: '图片上传失败',

@@ -6,30 +6,34 @@
     </view>
     <uni-icons v-if="gift.isMine" type="more-filled" @click="onMoreAction" />
   </view>
-  <uni-card
-    v-if="gift.image"
-    :key="gift.id"
-    class="gift-wrap"
-    :cover="gift.image"
-    :border="false"
-    padding="0"
-    margin="0"
-    :is-shadow="false"
-  >
-    <view class="gift-wrap-title">{{ gift.name }}</view>
-    <view class="gift-wrap-desc">{{ gift.description }}</view>
-  </uni-card>
+  <view>
+    <uni-card
+      v-if="gift.image"
+      :key="gift.id"
+      class="gift-wrap"
+      :cover="gift.image"
+      :border="false"
+      padding="0"
+      margin="0"
+      :is-shadow="false"
+    >
+      <view class="gift-wrap-title">{{ gift.name }}</view>
+      <view class="gift-wrap-desc">{{ gift.description }}</view>
+    </uni-card>
 
-  <view v-else>
-    <view class="default-cover">
-      <text>
-        {{ gift.name?.slice(0, maxFontLen) }}
-        <text v-if="gift.name?.length > maxFontLen">...</text>
-      </text>
+    <view v-else>
+      <view class="default-cover">
+        <text>
+          {{ gift.name?.slice(0, maxFontLen) }}
+          <text v-if="gift.name?.length > maxFontLen">...</text>
+        </text>
+      </view>
+      <view class="gift-wrap-title">{{ gift.name }}</view>
+      <view class="gift-wrap-desc">{{ gift.description }}</view>
     </view>
-    <view class="gift-wrap-title">{{ gift.name }}</view>
-    <view class="gift-wrap-desc">{{ gift.description }}</view>
   </view>
+
+  <view class="text-center text-weaken text-sm mb-1"> - 到底了 - </view>
 
   <view class="card-actions text-weaken">
     <view></view>
@@ -209,18 +213,19 @@ const onDelete = () => {
 }
 ::v-deep .uni-card__cover {
   margin-top: 0 !important;
+  border-radius: 0 !important;
 }
+
 .gift-wrap-title {
   font-size: 16px;
   padding: 10px;
   color: #000;
-  margin-bottom: 50px;
 }
 .gift-wrap-desc {
   font-size: 14px;
   color: #666;
   padding: 0 10px 10px 10px;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
 }
 .card-actions {
   display: flex;

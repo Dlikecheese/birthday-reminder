@@ -7,8 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue'
-import { onTabItemTap } from '@dcloudio/uni-app'
+import { ref, type Ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { isLogin, toLogin } from '@/utils/util'
 import { http } from '@/utils/http'
 import dayjs from 'dayjs'
@@ -27,7 +27,7 @@ const info: Ref<{
   selected: [],
 })
 
-onMounted(async () => {
+onShow(async () => {
   await checkLogin()
   getBirthdayList()
 })
@@ -54,10 +54,6 @@ const getCurrentYearBirthday = (birthday: string) => {
 
   return `${birthdayDateInThisYear.format('YYYY-MM-DD')}`
 }
-
-onTabItemTap(async () => {
-  await checkLogin()
-})
 
 const checkLogin = async () => {
   if (!isLogin()) {
