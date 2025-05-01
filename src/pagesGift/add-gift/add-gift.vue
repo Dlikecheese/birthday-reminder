@@ -20,7 +20,14 @@
     </uni-forms>
 
     <view class="example-body">
-      <uni-file-picker limit="1" title="选择图片" @select="select"></uni-file-picker>
+      <uni-file-picker
+        v-model="formData.image"
+        limit="1"
+        title="选择图片"
+        @select="selectFile"
+        @delete="deleteFile"
+        :del-icon="showDelIcon"
+      ></uni-file-picker>
     </view>
 
     <view class="box"></view>
@@ -40,6 +47,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { Sex } from '@/types/common.ts'
 
 let giftId = ref('')
+const showDelIcon = ref(true)
 onLoad(async ({ id }: any) => {
   if (id) {
     uni.setNavigationBarTitle({
@@ -47,6 +55,7 @@ onLoad(async ({ id }: any) => {
     })
 
     giftId.value = id
+    showDelIcon.value = false
 
     // 获取礼物详情
     uni.showLoading({
@@ -78,7 +87,13 @@ const formData = ref({
   description: '',
   usageSex: 'all',
   usageAge: 'all',
-  image: '',
+  image: undefined as
+    | {
+        name: string
+        extname: string
+        url: string
+      }
+    | undefined,
 })
 
 const rules = {
@@ -115,9 +130,90 @@ const rules = {
 // 引用表单
 const formRef = ref(null) as any
 
+/**
+ * 发送添加请求
+ */
+const sendAddRequestWithFile = async (params: any) => {
+  // 压缩文件
+  if (!selectImg) {
+    sendAddRequest(params)
+    return
+  }
+
+  const res = await uni.compressImage({
+    src: selectImg,
+    quality: 80,
+  })
+  selectImg = res.tempFilePath
+  uni.uploadFile({
+    url: `${baseURL}/common/upload`,
+    filePath: selectImg,
+    name: 'file',
+    header: {
+      'Content-Type': 'multipart/form-data',
+    },
+    success: async (res: any) => {
+      if (res.statusCode === 413) {
+        uni.showToast({
+          title: '图片超过5MB，请重新选择',
+          icon: 'error',
+        })
+        return
+      }
+      try {
+        const data = JSON.parse(res.data)
+        formData.value.image = data.data
+
+        await sendAddRequest({
+          ...params,
+          image: formData.value.image,
+        })
+      } catch (e) {
+        uni.showToast({
+          title: '图片上传失败',
+          icon: 'error',
+        })
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    fail: (fail) => {
+      uni.hideLoading()
+      uni.showToast({
+        title: fail.errMsg,
+        icon: 'error',
+      })
+    },
+  })
+}
+
+const sendAddRequest = async (params: any) => {
+  await http({
+    url: '/gift',
+    method: 'POST',
+    data: params,
+  })
+
+  uni.showToast({
+    title: '添加成功',
+    icon: 'success',
+  })
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('')
+    }, 200)
+  })
+  uni.navigateBack()
+}
+
 const submit = async () => {
   try {
     const val = await formRef.value?.validate()
+
+    uni.showLoading({
+      title: '提交中',
+      mask: true,
+    })
 
     if (giftId.value) {
       await http({
@@ -126,7 +222,6 @@ const submit = async () => {
         data: {
           ...val,
           id: giftId.value,
-          image: formData.value.image,
         },
       })
       uni.showToast({
@@ -144,25 +239,7 @@ const submit = async () => {
       return
     }
 
-    await http({
-      url: '/gift',
-      method: 'POST',
-      data: {
-        ...val,
-        image: formData.value.image,
-      },
-    })
-
-    uni.showToast({
-      title: '添加成功',
-      icon: 'success',
-    })
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('')
-      }, 200)
-    })
-    uni.navigateBack()
+    await sendAddRequestWithFile(val)
   } catch (error) {
     uni.showToast({
       title: '操作失败',
@@ -181,6 +258,13 @@ const getBirthdayDetail = async (id: string) => {
 
     // 设置表单数据
     formData.value = res.data
+    if (res.data.image) {
+      formData.value.image = {
+        name: res.data.image,
+        extname: res.data.image.split('.').pop(),
+        url: res.data.image,
+      }
+    }
   } catch (e) {
     uni.showToast({
       title: '获取礼物详情失败',
@@ -216,31 +300,19 @@ const remove = () => {
   })
 }
 
-const select = (e: any) => {
-  const tempFilePaths = e.tempFiles
+let selectImg = ''
+const selectFile = (e: any) => {
+  selectImg = e.tempFiles[0].path
+  formData.value.image = {
+    name: e.tempFiles[0].name,
+    extname: e.tempFiles[0].path.split('.').pop(),
+    url: e.tempFiles[0].path,
+  }
+}
 
-  uni.uploadFile({
-    url: `${baseURL}/common/upload`,
-    filePath: tempFilePaths[0].path,
-    name: 'file',
-    header: {
-      'Content-Type': 'multipart/form-data',
-    },
-    success: (res: any) => {
-      try {
-        const data = JSON.parse(res.data)
-        formData.value.image = data.data
-      } catch (e) {
-        uni.showToast({
-          title: '图片上传失败',
-          icon: 'error',
-        })
-      }
-    },
-    fail: (fail) => {
-      console.log(fail)
-    },
-  })
+const deleteFile = () => {
+  selectImg = ''
+  formData.value.image = undefined
 }
 </script>
 
