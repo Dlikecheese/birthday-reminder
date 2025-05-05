@@ -161,7 +161,10 @@ const getBirthdayList = async () => {
         const birthdayMonth = dayjs(ele.birthday).month()
         const birthdayDate = dayjs(ele.birthday).date()
         const birthdayDateInThisYear = dayjs().set('month', birthdayMonth).set('date', birthdayDate)
-        return birthdayDateInThisYear.diff(dayjs(), 'day') <= 30
+        return (
+          birthdayDateInThisYear.diff(dayjs(), 'day') <= 30 &&
+          birthdayDateInThisYear.diff(dayjs(), 'day') >= 0
+        )
       },
     )
 
@@ -183,26 +186,36 @@ const getBirthdayList = async () => {
  * 转换生日列表 生成年龄、生日描述、倒计时
  */
 const transformBirthday = (birthdayList: any[]): any[] => {
-  return birthdayList.map((ele) => {
-    const nextAge = dayjs().diff(ele.birthday, 'year') + 1
-    const zodiac = calculateZodiac(ele.birthday)
-    const desc = `${dayjs(ele.birthday).format('MM月DD日')} 属${zodiac} ${nextAge}岁`
+  return birthdayList
+    .map((ele) => {
+      const nextAge = dayjs().diff(ele.birthday, 'year') + 1
+      const zodiac = calculateZodiac(ele.birthday)
+      const desc = `${dayjs(ele.birthday).format('MM月DD日')} 属${zodiac} ${nextAge}岁`
 
-    const countdown = calcCountdown(ele.birthday)
-    return {
-      ...ele,
-      nextAge,
-      desc,
-      countdown,
-      options: swipeAction,
-    }
-  })
+      const countdown = calcCountdown(ele.birthday).text
+      return {
+        ...ele,
+        nextAge,
+        desc,
+        countdown,
+        options: swipeAction,
+        diffDays: calcCountdown(ele.birthday).days,
+      }
+    })
+    .sort((a, b) => {
+      return a.diffDays - b.diffDays
+    })
 }
 
 /**
  * 计算倒计时
  */
-const calcCountdown = (birthday: string): string => {
+const calcCountdown = (
+  birthday: string,
+): {
+  text: string
+  days: number
+} => {
   // 如果生日的月日小于当前的月日，说明今年的生日已经过了，计算下一年的生日还有多少天
   const birthdayMonth = dayjs(birthday).month()
   const birthdayDate = dayjs(birthday).date()
@@ -220,7 +233,10 @@ const calcCountdown = (birthday: string): string => {
     diff = birthdayDateInThisYear.diff(now, 'day')
   }
 
-  return getDiffText(diff)
+  return {
+    text: getDiffText(diff),
+    days: diff,
+  }
 }
 
 /**
