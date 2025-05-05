@@ -15,11 +15,15 @@
         <uni-data-select v-model="formData.usageSex" :localdata="sexOptions"></uni-data-select>
       </uni-forms-item>
       <uni-forms-item label="适用年龄段" name="usageAge">
-        <uni-data-select v-model="formData.usageAge" :localdata="usageAgeOptions"></uni-data-select>
+        <uni-data-checkbox
+          multiple
+          v-model="formData.usageAge"
+          :localdata="usageAgeOptions"
+        ></uni-data-checkbox>
       </uni-forms-item>
     </uni-forms>
 
-    <view class="example-body">
+    <view v-if="formData.image">
       <uni-file-picker
         v-model="formData.image"
         limit="1"
@@ -44,7 +48,7 @@
 import { baseURL, http } from '@/utils/http'
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { Sex } from '@/types/common.ts'
+import { AgeRange, Sex } from '@/types/common.ts'
 
 let giftId = ref('')
 const showDelIcon = ref(true)
@@ -68,25 +72,27 @@ onLoad(async ({ id }: any) => {
 })
 
 const sexOptions = [
-  { value: 'all', text: '通用' },
+  { value: Sex.ALL, text: '通用' },
   { value: Sex.MALE, text: '男' },
   { value: Sex.FEMALE, text: '女' },
 ]
 const usageAgeOptions = [
-  { value: 'all', text: '通用' },
-  { value: '0', text: '婴幼儿' },
-  { value: '1', text: '童年' },
-  { value: '2', text: '少年' },
-  { value: '3', text: '青年' },
-  { value: '4', text: '中年' },
-  { value: '5', text: '老年' },
+  { value: AgeRange.ALL, text: '通用' },
+  { value: AgeRange.INFANT, text: '婴儿(0 - 1岁)' },
+  { value: AgeRange.TODDLER, text: '幼儿(1 - 3岁)' },
+  { value: AgeRange.PRESCHOOLER, text: '学龄前儿童(3 - 6岁)' },
+  { value: AgeRange.CHILD, text: '儿童(6 - 12岁)' },
+  { value: AgeRange.TEENAGER, text: '少年(12 - 18岁)' },
+  { value: AgeRange.YOUTH, text: '青年(18 - 35岁)' },
+  { value: AgeRange.MIDDLE_AGED, text: '中年(35 - 60岁)' },
+  { value: AgeRange.ELDERLY, text: '老年(60岁以上)' },
 ]
 
 const formData = ref({
   name: '',
   description: '',
-  usageSex: 'all',
-  usageAge: 'all',
+  usageSex: Sex.ALL,
+  usageAge: [AgeRange.ALL],
   image: undefined as
     | {
         name: string
@@ -209,6 +215,12 @@ const sendAddRequest = async (params: any) => {
 const submit = async () => {
   try {
     const val = await formRef.value?.validate()
+
+    if (val.usageAge.includes('all')) {
+      val.usageAge = ['all']
+    } else {
+      val.usageAge = val.usageAge.filter((item: string) => item !== 'all')
+    }
 
     uni.showLoading({
       title: '提交中',
