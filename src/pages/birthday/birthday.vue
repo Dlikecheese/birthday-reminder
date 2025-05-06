@@ -99,9 +99,6 @@ import { ref } from 'vue'
 
 const authPopupRef = ref(null) as any
 
-onShow(async () => {
-  await checkLogin()
-})
 const checkLogin = async () => {
   if (!isLogin()) {
     try {
@@ -136,6 +133,8 @@ const swipeAction = [
 const loading = ref(false)
 
 onShow(async () => {
+  await checkLogin()
+
   loading.value = true
   uni.showLoading({
     title: '加载中',

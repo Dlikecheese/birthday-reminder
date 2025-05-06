@@ -1,6 +1,11 @@
 <template>
   <view>
-    <uni-calendar :selected="info.selected" :showMonth="true" @monthSwitch="monthSwith" />
+    <uni-calendar
+      :lunar="true"
+      :selected="info.selected"
+      :showMonth="true"
+      @monthSwitch="monthSwith"
+    />
 
     <view v-if="birthdaysInCurrentMonth.length">
       <uni-notice-bar single :text="noticeText" />

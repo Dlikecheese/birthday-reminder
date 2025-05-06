@@ -10,43 +10,54 @@
   </view>
   <!-- 图片列表 -->
   <view class="waterfall-container">
-    <br-card
-      v-for="item in displayedList"
-      :item="item"
-      :key="item.id"
-      class="waterfall-item"
-      @click="toDetail(item)"
-    >
-      <template v-slot:title>
-        <view class="waterfall-item-title"
-          ><text>
-            {{ item.name?.slice(0, maxFontLen) }}
-            <text v-if="item.name?.length > maxFontLen">...</text>
-          </text></view
-        >
-      </template>
-      <template v-slot:actions>
-        <view class="card-actions text-weaken">
-          <view class="card-actions-item">
-            <image class="avatar" :src="item.creatorAvatar" />
-            <text>{{ item.creatorName }}</text>
+    <view class="waterfall-card-container">
+      <br-card
+        v-for="item in displayedList"
+        :item="item"
+        :key="item.id"
+        class="waterfall-item"
+        @click="toDetail(item)"
+      >
+        <template v-slot:title>
+          <view class="waterfall-item-title"
+            ><text>
+              {{ item.name?.slice(0, maxFontLen) }}
+              <text v-if="item.name?.length > maxFontLen">...</text>
+            </text></view
+          >
+        </template>
+        <template v-slot:actions>
+          <view class="card-actions text-weaken">
+            <view class="card-actions-item">
+              <image class="avatar" :src="item.creatorAvatar" />
+              <text>{{ item.creatorName }}</text>
+            </view>
+            <view class="card-actions-item">
+              <uni-icons
+                v-if="item.isFavoritedByUser"
+                type="heart-filled"
+                size="16"
+                color="#eb414a"
+              />
+              <uni-icons v-else type="heart" size="16" color="#999" />
+              <text>{{ item.favoriteCount ?? 0 }}</text>
+              <uni-icons
+                v-if="item.isCollectedByUser"
+                type="star-filled"
+                size="20"
+                color="#f38f66"
+              />
+              <uni-icons v-else type="star" size="20" color="#999" />
+              <text>{{ item.collectCount ?? 0 }}</text>
+            </view>
           </view>
-          <view class="card-actions-item">
-            <uni-icons
-              v-if="item.isFavoritedByUser"
-              type="heart-filled"
-              size="16"
-              color="#eb414a"
-            />
-            <uni-icons v-else type="heart" size="16" color="#999" />
-            <text>{{ item.favoriteCount ?? 0 }}</text>
-            <uni-icons v-if="item.isCollectedByUser" type="star-filled" size="20" color="#f38f66" />
-            <uni-icons v-else type="star" size="20" color="#999" />
-            <text>{{ item.collectCount ?? 0 }}</text>
-          </view>
-        </view>
-      </template>
-    </br-card>
+        </template>
+      </br-card>
+    </view>
+
+    <view class="flex justify-center items-center">
+      <uni-load-more :status="loadingStatus" />
+    </view>
   </view>
 
   <!-- 创建 -->
@@ -63,10 +74,6 @@ import { http } from '@/utils/http'
 import { onReachBottom, onShow } from '@dcloudio/uni-app'
 import { isLogin, toLogin } from '@/utils/util'
 const authPopupRef = ref(null) as any
-
-onShow(async () => {
-  await checkLogin()
-})
 
 const checkLogin = async () => {
   if (!isLogin()) {
@@ -89,12 +96,16 @@ const activeColor = '#007aff'
 const defaultPageSize = 6
 // 当前总数
 let total = 0
+let loadingStatus = ref('more') as any // 加载状态
 
 // 触底加载
 onReachBottom(async () => {
   if (displayedList.value.length >= total) {
+    loadingStatus.value = 'noMore'
     return
   }
+
+  loadingStatus.value = 'loading'
 
   const res = await getGfitList({
     start: displayedList.value.length,
@@ -103,9 +114,12 @@ onReachBottom(async () => {
     isCollect: false,
   })
   displayedList.value = [...displayedList.value, ...res.rows]
+  loadingStatus.value = 'more'
 })
 
-onShow(() => {
+onShow(async () => {
+  await checkLogin()
+
   refreshList(current.value)
 })
 
@@ -152,6 +166,7 @@ const refreshList = async (currentTab: GiftType) => {
 
   displayedList.value = res.rows
   total = res.total
+  loadingStatus.value = res.total > 4 ? 'more' : 'noMore'
 }
 
 const getGfitList = async (
@@ -205,12 +220,14 @@ const addGift = () => {
 }
 
 .waterfall-container {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
   background-color: #fafafa;
   padding: 2px 0 4px 4px;
+  .waterfall-card-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
 }
 
 .waterfall-item {

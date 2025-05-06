@@ -19,6 +19,15 @@
     >
       <view class="gift-wrap-title">{{ gift.name }}</view>
       <view class="gift-wrap-desc">{{ gift.description }}</view>
+      <view class="uni-tag-wrap">
+        <uni-tag
+          v-for="(tag, index) in gift.tags"
+          :key="index"
+          :text="tag"
+          custom-style="background-color: #ff4b78; border-color: #ff4b78;"
+        />
+      </view>
+      <view class="gift-update-time">编辑于{{ gift.updateTime }}</view>
     </uni-card>
 
     <view v-else>
@@ -30,6 +39,15 @@
       </view>
       <view class="gift-wrap-title">{{ gift.name }}</view>
       <view class="gift-wrap-desc">{{ gift.description }}</view>
+      <view class="uni-tag-wrap">
+        <uni-tag
+          v-for="(tag, index) in gift.tags"
+          :key="index"
+          :text="tag"
+          custom-style="background-color: #ff4b78; border-color: #ff4b78;"
+        />
+      </view>
+      <view class="gift-update-time">编辑于{{ gift.updateTime }}</view>
     </view>
   </view>
 
@@ -71,6 +89,8 @@
 import { http } from '@/utils/http'
 import { ref, type Ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
+import { sexOptions, usageAgeOptions } from '@/utils/common'
+import { AgeRange, Sex } from '@/types/common'
 
 // 最长显示文字长度
 const maxFontLen = 100
@@ -112,13 +132,28 @@ const getBirthdayDetail = async (id: string) => {
       method: 'GET',
     })
 
+    const usageSex =
+      res.data.usageSex === Sex.ALL
+        ? '男女通用'
+        : sexOptions.find((item: any) => item.value === res.data.usageSex)?.text
+    const usageAge =
+      res.data.usageAge?.[0] === AgeRange.ALL
+        ? ['各年龄段通用']
+        : res.data.usageAge.map((item: any) => {
+            return usageAgeOptions.find((i) => i.value === item)?.text
+          })
+    const tags = [usageSex].concat(usageAge)
+
     gift.value = {
       ...gift.value,
       description: res.data.description,
       isMine: res.data.isMine,
       name: res.data.name,
       image: res.data.image,
+      updateTime: res.data.updateTime,
+      tags,
     }
+    console.log('gift.value', gift.value)
   } catch (e) {
     uni.showToast({
       title: '获取礼物详情失败',
@@ -225,7 +260,13 @@ const onDelete = () => {
   font-size: 14px;
   color: #666;
   padding: 0 10px 10px 10px;
+}
+.gift-update-time {
   margin-bottom: 50px;
+  padding: 10px;
+  color: #666;
+  font-size: 12px;
+  border-bottom: 1px solid #eee;
 }
 .card-actions {
   display: flex;
@@ -282,5 +323,16 @@ const onDelete = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+uni-icons {
+  margin: 0 10px;
+  padding: 0 10px;
+}
+.uni-tag-wrap {
+  padding: 0 10px;
+}
+uni-tag {
+  margin: 0 5px;
 }
 </style>
