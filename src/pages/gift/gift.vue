@@ -62,27 +62,20 @@
 
   <!-- 创建 -->
   <uni-icons type="plus" color="#ff6e95" size="40" class="icon" @click="addGift" />
-
-  <AuthPopup ref="authPopupRef" />
 </template>
 
 <script lang="ts" setup>
-const maxFontLen = 18
-import { ref, type Ref } from 'vue'
+import { computed, onMounted, ref, type Ref } from 'vue'
 import { GiftType } from './gift.type'
 import { http } from '@/utils/http'
-import { onReachBottom, onShow } from '@dcloudio/uni-app'
+import { onReachBottom } from '@dcloudio/uni-app'
 import { isLogin, toLogin } from '@/utils/util'
-const authPopupRef = ref(null) as any
+const maxFontLen = 18
 
 const checkLogin = async () => {
   if (!isLogin()) {
     try {
-      const userInfo = await toLogin()
-
-      if (!userInfo) {
-        authPopupRef.value?.openPopup?.()
-      }
+      await toLogin()
     } catch (error) {
       console.error(error)
     }
@@ -110,14 +103,14 @@ onReachBottom(async () => {
   const res = await getGfitList({
     start: displayedList.value.length,
     pageSize: defaultPageSize,
-    isMine: false,
-    isCollect: false,
+    isMine: isMine.value,
+    isCollect: isCollect.value,
   })
   displayedList.value = [...displayedList.value, ...res.rows]
   loadingStatus.value = 'more'
 })
 
-onShow(async () => {
+onMounted(async () => {
   await checkLogin()
 
   refreshList(current.value)
@@ -136,6 +129,20 @@ const onClickTab = ({ currentIndex }: any) => {
 
   refreshList(currentIndex)
 }
+
+// 计算属性，isMine的值根据currentTab的值
+const isMine = computed(() => {
+  if (current.value === GiftType.OWN) {
+    return true
+  }
+  return false
+})
+const isCollect = computed(() => {
+  if (current.value === GiftType.COLLECT) {
+    return true
+  }
+  return false
+})
 
 /*
  * 重新获取列表

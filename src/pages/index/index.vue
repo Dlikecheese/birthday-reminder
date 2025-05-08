@@ -15,19 +15,14 @@
       <view> 当月暂无生日哦～ </view>
       <view class="text-link link" @click="toBirthdayPage">查看所有生日</view>
     </view>
-
-    <AuthPopup ref="authPopupRef" />
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onMounted, ref, type Ref } from 'vue'
 import { isLogin, toLogin } from '@/utils/util'
 import { http } from '@/utils/http'
 import dayjs from 'dayjs'
-
-const authPopupRef = ref(null) as any
 
 const info: Ref<{
   lunar: boolean
@@ -54,7 +49,7 @@ const monthSwith = (e: any) => {
   noticeText = `本月有 ${birthdaysInCurrentMonth.value.length} 个生日`
 }
 
-onShow(async () => {
+onMounted(async () => {
   await checkLogin()
   getBirthdayList()
 })
@@ -85,11 +80,7 @@ const getCurrentYearBirthday = (birthday: string) => {
 const checkLogin = async () => {
   if (!isLogin()) {
     try {
-      const userInfo = await toLogin()
-
-      if (!userInfo) {
-        authPopupRef.value?.openPopup?.()
-      }
+      await toLogin()
     } catch (error) {
       console.error(error)
     }

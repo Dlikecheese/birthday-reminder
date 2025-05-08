@@ -1,10 +1,10 @@
 <template>
   <div class="add-birthday card">
     <uni-forms ref="formRef" :modelValue="formData" :rules="rules">
-      <uni-forms-item label="昵称" name="name">
+      <uni-forms-item label="昵称" name="name" required>
         <uni-easyinput type="text" v-model="formData.name" placeholder="请输入昵称" />
       </uni-forms-item>
-      <uni-forms-item label="生日" name="birthday">
+      <uni-forms-item label="生日" name="birthday" required>
         <uni-datetime-picker type="date" v-model="formData.birthday"></uni-datetime-picker>
       </uni-forms-item>
       <uni-forms-item label="生日提醒" name="remindTime">
@@ -24,17 +24,8 @@
           :localdata="relationOptions"
         ></uni-data-checkbox>
       </uni-forms-item>
-      <uni-forms-item label="手机" name="phone">
-        <uni-easyinput v-model="formData.phone" type="text" placeholder="请输入手机" />
-      </uni-forms-item>
-      <uni-forms-item label="地址" name="address">
-        <uni-easyinput v-model="formData.address" type="text" placeholder="请输入地址" />
-      </uni-forms-item>
       <uni-forms-item label="备注" name="comment">
         <uni-easyinput v-model="formData.comment" type="text" placeholder="请输入备注" />
-      </uni-forms-item>
-      <uni-forms-item label="个性标签" name="tag">
-        <uni-easyinput v-model="formData.tag" type="text" placeholder="请输入个性标签" />
       </uni-forms-item>
     </uni-forms>
     <view class="box"></view>
@@ -98,12 +89,9 @@ const formData = ref({
   name: '',
   sex: '',
   birthday: '',
-  phone: '',
   remindTime: [RemindeType.ONE_DAY],
   relation: '',
-  address: '',
   comment: '',
-  tag: '',
 })
 
 const rules = {
@@ -123,16 +111,6 @@ const rules = {
       },
     ],
     label: '姓名',
-    validateTrigger: 'submit',
-  },
-  phone: {
-    rules: [
-      {
-        pattern: /^1[3456789]\d{9}$/,
-        errorMessage: '手机号格式不正确',
-      },
-    ],
-    label: '手机号',
     validateTrigger: 'submit',
   },
   birthday: {

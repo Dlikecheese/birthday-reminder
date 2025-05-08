@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <uni-forms ref="formRef" :modelValue="formData" :rules="rules" label-width="100px">
-      <uni-forms-item label="礼物名" name="name">
+      <uni-forms-item label="礼物名" name="name" required>
         <uni-easyinput type="text" v-model="formData.name" placeholder="请输入礼物名" />
       </uni-forms-item>
       <uni-forms-item label="描述" name="description">
@@ -11,10 +11,10 @@
           placeholder="请输入礼物描述"
         />
       </uni-forms-item>
-      <uni-forms-item label="适用性别" name="usageSex">
+      <uni-forms-item label="适用性别" name="usageSex" required>
         <uni-data-select v-model="formData.usageSex" :localdata="sexOptions"></uni-data-select>
       </uni-forms-item>
-      <uni-forms-item label="适用年龄段" name="usageAge">
+      <uni-forms-item label="适用年龄段" name="usageAge" required>
         <uni-data-checkbox
           multiple
           v-model="formData.usageAge"

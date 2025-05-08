@@ -10,7 +10,7 @@ export const isLogin = (): boolean => {
 export const toLogin = async (): Promise<UserInfo | undefined> => {
   const res = await uni.showModal({
     title: '温馨提示',
-    content: '授权微信登录后才能使用',
+    content: '请登录后使用',
     confirmText: '登录',
     showCancel: false,
   })
@@ -31,6 +31,8 @@ export const wxLogin = async (): Promise<UserInfo | undefined> => {
     const res = await uni.login({
       provider: 'weixin',
     })
+    console.log(res)
+
     if (res.code) {
       return await login(res.code)
     }
@@ -39,8 +41,6 @@ export const wxLogin = async (): Promise<UserInfo | undefined> => {
       title: '登录失败，请重试',
       icon: 'error',
     })
-  } finally {
-    uni.hideLoading()
   }
 }
 
@@ -69,10 +69,28 @@ const login = async (code: string): Promise<UserInfo | undefined> => {
       icon: 'success',
     })
 
-    // 如果没有昵称，弹出授权弹窗
     if (!data?.name) {
-      // 隐藏底部导航栏
-      uni.hideTabBar()
+      // 获取用户信息
+      const userInfo: UserInfo = await getWXUserInfo()
+      const imgUrl = userInfo.avatarUrl
+      const name = userInfo.nickName
+
+      // 添加用户信息
+      await http({
+        url: `/user/${userStore.profile?.id}`,
+        method: 'PUT',
+        data: {
+          avatar: imgUrl,
+          name: name,
+        },
+      })
+
+      userStore.setProfile({
+        ...userStore.profile,
+        avatarUrl: imgUrl,
+        name: name,
+      })
+
       return
     }
 
@@ -84,6 +102,23 @@ const login = async (code: string): Promise<UserInfo | undefined> => {
     })
     return
   }
+}
+
+export const getWXUserInfo = (): Promise<UserInfo> => {
+  return new Promise((resolve, reject) => {
+    uni.getUserInfo({
+      provider: 'weixin',
+      success: (res: any) => {
+        resolve(res.userInfo) // 成功时返回结果
+      },
+      fail: (err) => {
+        uni.showToast({
+          title: err?.errMsg ?? '获取用户信息失败',
+          icon: 'none',
+        })
+      },
+    })
+  })
 }
 
 /** 计算生肖 */

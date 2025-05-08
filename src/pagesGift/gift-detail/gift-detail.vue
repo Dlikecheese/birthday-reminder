@@ -27,7 +27,10 @@
           custom-style="background-color: #ff4b78; border-color: #ff4b78;"
         />
       </view>
-      <view class="gift-update-time">编辑于{{ gift.updateTime }}</view>
+      <view class="gift-update-time"
+        >编辑于
+        <uni-dateformat :date="gift.updateTime" :threshold="[0, 3600000]"></uni-dateformat>
+      </view>
     </uni-card>
 
     <view v-else>
@@ -47,7 +50,11 @@
           custom-style="background-color: #ff4b78; border-color: #ff4b78;"
         />
       </view>
-      <view class="gift-update-time">编辑于{{ gift.updateTime }}</view>
+
+      <view class="gift-update-time"
+        >编辑于
+        <uni-dateformat :date="gift.updateTime" :threshold="[0, 3600000]"></uni-dateformat>
+      </view>
     </view>
   </view>
 
@@ -331,8 +338,11 @@ uni-icons {
 }
 .uni-tag-wrap {
   padding: 0 10px;
+  display: flex;
+  flex-wrap: wrap;
 }
 uni-tag {
-  margin: 0 5px;
+  margin: 0 5px 10px 5px;
+  flex-shrink: 0;
 }
 </style>

@@ -51,5 +51,6 @@ const click = (item: any) => {
   justify-content: center;
   border-radius: 4px;
   font-weight: 600;
+  padding: 10px;
 }
 </style>

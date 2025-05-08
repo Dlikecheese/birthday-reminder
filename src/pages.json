@@ -127,6 +127,12 @@
           "style": {
             "navigationBarTitleText": "隐私协议"
           }
+        },
+        {
+          "path": "edit-info/edit-info",
+          "style": {
+            "navigationBarTitleText": "个人信息"
+          }
         }
       ]
     }

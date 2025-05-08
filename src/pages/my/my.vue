@@ -27,15 +27,10 @@ useUserStore().$subscribe((mutation, state) => {
   }
 })
 
-const authPopupRef = ref(null) as any
 const login = async () => {
   // 弹出登录中的弹窗
   uni.showLoading({ title: '登录中' })
-  const userInfo = await wxLogin()
-
-  if (!userInfo) {
-    authPopupRef.value?.openPopup?.()
-  }
+  await wxLogin()
 }
 
 const logout = async () => {
@@ -64,9 +59,9 @@ const operations = [
   {
     label: '我的信息',
     click: () => {
-      // uni.navigateTo({
-      //   url: '/pages/myInfo/myInfo',
-      // })
+      uni.navigateTo({
+        url: '/pagesMy/edit-info/edit-info',
+      })
     },
     id: 'info',
   },
@@ -109,8 +104,6 @@ const operations = [
       </view>
     </view>
   </view>
-
-  <AuthPopup ref="authPopupRef" />
 </template>
 
 <style lang="scss">

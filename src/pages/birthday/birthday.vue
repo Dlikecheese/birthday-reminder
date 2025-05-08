@@ -86,8 +86,6 @@
   </view>
 
   <uni-icons type="plus" color="#ff6e95" size="40" class="icon" @click="addBirthday" />
-
-  <AuthPopup ref="authPopupRef" />
 </template>
 
 <script lang="ts" setup>
@@ -95,18 +93,12 @@ import { http } from '@/utils/http'
 import { calculateZodiac, isLogin, toLogin } from '@/utils/util'
 import { onShow } from '@dcloudio/uni-app'
 import dayjs from 'dayjs'
-import { ref } from 'vue'
-
-const authPopupRef = ref(null) as any
+import { onMounted, ref } from 'vue'
 
 const checkLogin = async () => {
   if (!isLogin()) {
     try {
-      const userInfo = await toLogin()
-
-      if (!userInfo) {
-        authPopupRef.value?.openPopup?.()
-      }
+      await toLogin()
     } catch (error) {
       console.error(error)
     }
@@ -132,7 +124,7 @@ const swipeAction = [
 ]
 const loading = ref(false)
 
-onShow(async () => {
+onMounted(async () => {
   await checkLogin()
 
   loading.value = true
