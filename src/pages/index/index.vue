@@ -43,7 +43,6 @@ const monthSwith = (e: any) => {
   const { month } = e
   birthdaysInCurrentMonth.value = info.value.selected.filter((item: any) => {
     const birthdayDate = dayjs(item.date)
-    console.log(birthdayDate.month(), month)
     return birthdayDate.month() + 1 === month
   })
   noticeText = `本月有 ${birthdaysInCurrentMonth.value.length} 个生日`
@@ -66,6 +65,10 @@ const getBirthdayList = async () => {
       date: getCurrentYearBirthday(item.birthday),
       info: `${item.name}生日`,
     }
+  })
+
+  monthSwith({
+    month: dayjs().month() + 1,
   })
 }
 

@@ -160,7 +160,6 @@ const getBirthdayDetail = async (id: string) => {
       updateTime: res.data.updateTime,
       tags,
     }
-    console.log('gift.value', gift.value)
   } catch (e) {
     uni.showToast({
       title: '获取礼物详情失败',

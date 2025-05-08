@@ -8,17 +8,6 @@ export const isLogin = (): boolean => {
 }
 
 export const toLogin = async (): Promise<UserInfo | undefined> => {
-  const res = await uni.showModal({
-    title: '温馨提示',
-    content: '请登录后使用',
-    confirmText: '登录',
-    showCancel: false,
-  })
-
-  if (!res.confirm) {
-    return
-  }
-
   uni.showLoading({
     title: '登录中',
   })
@@ -31,7 +20,6 @@ export const wxLogin = async (): Promise<UserInfo | undefined> => {
     const res = await uni.login({
       provider: 'weixin',
     })
-    console.log(res)
 
     if (res.code) {
       return await login(res.code)
