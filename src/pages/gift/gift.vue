@@ -68,7 +68,7 @@
 import { computed, onMounted, ref, type Ref } from 'vue'
 import { GiftType } from './gift.type'
 import { http } from '@/utils/http'
-import { onReachBottom } from '@dcloudio/uni-app'
+import { onReachBottom, onShow } from '@dcloudio/uni-app'
 import { isLogin, toLogin } from '@/utils/util'
 const maxFontLen = 18
 
@@ -114,6 +114,13 @@ onMounted(async () => {
   await checkLogin()
 
   refreshList(current.value)
+})
+
+onShow(() => {
+  if (uni.getStorageSync('refresh')) {
+    refreshList(current.value)
+    uni.removeStorageSync('refresh')
+  }
 })
 
 const toDetail = (item: any) => {

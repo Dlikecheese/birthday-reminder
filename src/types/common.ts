@@ -33,3 +33,25 @@ export enum AgeRange {
   // 老年：年龄范围为 60 岁及以上
   ELDERLY = 'ELDERLY',
 }
+
+/** 提醒时间类型 */
+export enum RemindeType {
+  ONE_DAY = 'ONE_DAY',
+  TWO_DAY = 'TWO_DAY',
+  THREE_DAY = 'THREE_DAY',
+  FOUR_DAY = 'FOUR_DAY',
+  ONE_WEEK = 'ONE_WEEK',
+  ONE_MONTH = 'ONE_MONTH',
+}
+
+/**
+ * 关系
+ */
+export enum Relation {
+  FAMILY = 'FAMILY',
+  FRIEND = 'FRIEND',
+  COLLEAGUE = 'COLLEAGUE',
+  TEACHER = 'TEACHER',
+  CUSTOM = 'CUSTOM',
+  OTHER = 'OTHER',
+}

@@ -326,21 +326,25 @@ $theme-color: #ff4b78;
 
 .mb-1 {
   margin-bottom: 0.25rem;
-  /* 4px */
+  /* 2px */
 }
 .mb-2 {
   margin-bottom: 0.5rem;
-  /* 8px */
+  /* 4px */
 }
 .mb-4 {
   margin-bottom: 1rem;
-  /* 16px */
+  /* 8px */
 }
 .mb-8 {
   margin-bottom: 2rem;
-  /* 32px */
+  /* 16px */
 }
 
+.mt-2{
+  margin-top: 0.5rem;
+  /* 4px */
+}
 .text-weanken{
   color: #6c757d;
 }

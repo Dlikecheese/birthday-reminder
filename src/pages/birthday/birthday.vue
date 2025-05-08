@@ -91,7 +91,7 @@
 <script lang="ts" setup>
 import { http } from '@/utils/http'
 import { calculateZodiac, isLogin, toLogin } from '@/utils/util'
-import { onShow } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import dayjs from 'dayjs'
 import { onMounted, ref } from 'vue'
 
@@ -127,6 +127,17 @@ const loading = ref(false)
 onMounted(async () => {
   await checkLogin()
 
+  refreshData()
+})
+
+onShow(() => {
+  if (uni.getStorageSync('refresh')) {
+    refreshData()
+    uni.removeStorageSync('refresh')
+  }
+})
+
+const refreshData = async () => {
   loading.value = true
   uni.showLoading({
     title: '加载中',
@@ -137,7 +148,7 @@ onMounted(async () => {
     uni.hideLoading()
     loading.value = false
   }
-})
+}
 
 const getBirthdayList = async () => {
   try {

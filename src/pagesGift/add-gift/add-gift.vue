@@ -193,6 +193,7 @@ const sendAddRequest = async (params: any) => {
       resolve('')
     }, 200)
   })
+  uni.setStorageSync('refresh', true)
   uni.navigateBack()
 }
 
@@ -231,6 +232,7 @@ const submit = async () => {
         }, 200)
       })
 
+      uni.setStorageSync('refresh', true)
       uni.navigateBack()
       return
     }

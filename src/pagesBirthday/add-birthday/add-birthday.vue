@@ -4,8 +4,35 @@
       <uni-forms-item label="昵称" name="name" required>
         <uni-easyinput type="text" v-model="formData.name" placeholder="请输入昵称" />
       </uni-forms-item>
-      <uni-forms-item label="生日" name="birthday" required>
+      <uni-forms-item label="生日" name="birthdayType" required>
+        <uni-data-checkbox
+          v-model="formData.birthdayType"
+          :localdata="birthdayTypes"
+        ></uni-data-checkbox>
+      </uni-forms-item>
+      <uni-forms-item v-if="formData.birthdayType === BirthdayType.SOLAR" name="birthday">
         <uni-datetime-picker type="date" v-model="formData.birthday"></uni-datetime-picker>
+      </uni-forms-item>
+      <uni-forms-item label="" v-else>
+        <view class="flex flex-col gap-2">
+          <uni-data-select
+            v-model="lunarYear"
+            :localdata="lunarYearOptions"
+            placeholder="请选择农历年"
+          ></uni-data-select>
+
+          <uni-data-select
+            v-model="lunarMonth"
+            :localdata="lunarMonthOptions"
+            placeholder="请选择农历月"
+          ></uni-data-select>
+
+          <uni-data-select
+            v-model="lunarDay"
+            :localdata="lunarDayOptions"
+            placeholder="请选择农历日"
+          ></uni-data-select>
+        </view>
       </uni-forms-item>
       <uni-forms-item label="生日提醒" name="remindTime">
         <uni-data-checkbox
@@ -41,11 +68,23 @@
 <script lang="ts" setup>
 import { http } from '@/utils/http'
 import { ref } from 'vue'
-import { Relation, RemindeType } from './add-birthday.type'
+import { BirthdayType } from './add-birthday.type'
 import { onLoad } from '@dcloudio/uni-app'
-import { Sex } from '@/types/common'
+
+import calendar from 'js-calendar-converter'
+
+import {
+  sexOptions,
+  remindTimes,
+  relationOptions,
+  lunarYearOptions,
+  lunarMonthOptions,
+  lunarDayOptions,
+} from '@/utils/common'
+import { RemindeType } from '@/types/common'
 
 let birthdayId = ref('')
+
 onLoad(async ({ id }: any) => {
   if (id) {
     uni.setNavigationBarTitle({
@@ -64,35 +103,26 @@ onLoad(async ({ id }: any) => {
   }
 })
 
-const sexOptions = [
-  { value: Sex.MALE, text: '男' },
-  { value: Sex.FEMALE, text: '女' },
-]
-const remindTimes = [
-  { value: RemindeType.ONE_DAY, text: '提前一天' },
-  { value: RemindeType.TWO_DAY, text: '提前两天' },
-  { value: RemindeType.THREE_DAY, text: '提前三天' },
-  { value: RemindeType.FOUR_DAY, text: '提前四天' },
-  { value: RemindeType.ONE_WEEK, text: '提前一周' },
-  { value: RemindeType.ONE_MONTH, text: '提前一月' },
-]
-const relationOptions = [
-  { value: Relation.FAMILY, text: '亲人' },
-  { value: Relation.FRIEND, text: '朋友' },
-  { value: Relation.TEACHER, text: '老师' },
-  { value: Relation.COLLEAGUE, text: '同事' },
-  { value: Relation.CUSTOM, text: '客户' },
-  { value: Relation.OTHER, text: '其他' },
+const birthdayTypes = [
+  { value: BirthdayType.SOLAR, text: '公历' },
+  { value: BirthdayType.LUNAR, text: '农历' },
 ]
 
 const formData = ref({
   name: '',
   sex: '',
   birthday: '',
+  birthdayType: BirthdayType.SOLAR,
   remindTime: [RemindeType.ONE_DAY],
   relation: '',
   comment: '',
 })
+
+let lunarYear = ref('')
+let lunarMonth = ref('')
+let lunarDay = ref('')
+
+console.log(calendar.lunar2solar(2024, '02', 29))
 
 const rules = {
   name: {
@@ -113,31 +143,65 @@ const rules = {
     label: '姓名',
     validateTrigger: 'submit',
   },
-  birthday: {
-    rules: [
-      {
-        required: true,
-        errorMessage: '请填写生日',
-      },
-    ],
-    label: '生日',
-    validateTrigger: 'submit',
-  },
 }
 
 // 引用表单
 const formRef = ref(null) as any
 
-const submit = async () => {
-  try {
-    const val = await formRef.value?.validate()
+const checkForm = (val: any): boolean => {
+  console.log(val.birthdayType)
 
+  if (val.birthdayType === BirthdayType.LUNAR) {
+    if (!lunarYear.value || !lunarMonth.value || !lunarDay.value) {
+      uni.showToast({
+        title: '请填写生日',
+        icon: 'error',
+      })
+      return false
+    }
+
+    if (calendar.lunar2solar(lunarYear.value, lunarMonth.value, lunarDay.value) === -1) {
+      uni.showToast({
+        title: '农历日期不正确',
+        icon: 'error',
+      })
+      return false
+    }
+  } else {
+    if (!val.birthday) {
+      uni.showToast({
+        title: '请填写生日',
+        icon: 'error',
+      })
+      return false
+    }
+  }
+  return true
+}
+
+const submit = async () => {
+  const val = await formRef.value?.validate()
+  console.log(val)
+
+  if (!checkForm(val)) {
+    return
+  }
+
+  try {
+    const params = {
+      ...val,
+      birthday:
+        val.birthdayType === BirthdayType.SOLAR
+          ? val.birthday
+          : `${lunarYear.value}-${lunarMonth.value}-${lunarDay.value}`,
+      birthdayType: val.birthdayType,
+    }
     if (birthdayId.value) {
       await http({
         url: '/birthday',
         method: 'PUT',
         data: {
-          ...val,
+          ...params,
           id: birthdayId.value,
         },
       })
@@ -152,6 +216,7 @@ const submit = async () => {
         }, 200)
       })
 
+      uni.setStorageSync('refresh', true)
       uni.navigateBack()
       return
     }
@@ -159,7 +224,7 @@ const submit = async () => {
     await http({
       url: '/birthday',
       method: 'POST',
-      data: val,
+      data: params,
     })
 
     uni.showToast({
@@ -171,6 +236,7 @@ const submit = async () => {
         resolve('')
       }, 200)
     })
+    uni.setStorageSync('refresh', true)
     uni.navigateBack()
   } catch (error) {
     uni.showToast({
@@ -213,6 +279,7 @@ const remove = () => {
             title: '删除成功',
             icon: 'success',
           })
+          uni.setStorageSync('refresh', true)
           uni.navigateBack()
         } catch (e) {
           uni.showToast({

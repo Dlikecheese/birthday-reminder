@@ -227,6 +227,7 @@ const onDelete = () => {
               icon: 'success',
             })
 
+            uni.setStorageSync('refresh', true)
             uni.navigateBack()
           }, 800)
         } catch (e) {
