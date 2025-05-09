@@ -10,10 +10,10 @@
           :localdata="birthdayTypes"
         ></uni-data-checkbox>
       </uni-forms-item>
-      <uni-forms-item v-if="formData.birthdayType === BirthdayType.SOLAR" name="birthday">
+      <uni-forms-item label=" " v-if="formData.birthdayType === BirthdayType.SOLAR" name="birthday">
         <uni-datetime-picker type="date" v-model="formData.birthday"></uni-datetime-picker>
       </uni-forms-item>
-      <uni-forms-item label="" v-else>
+      <uni-forms-item label=" " v-else>
         <view class="flex flex-col gap-2">
           <uni-data-select
             v-model="lunarYear"
@@ -68,7 +68,6 @@
 <script lang="ts" setup>
 import { http } from '@/utils/http'
 import { ref } from 'vue'
-import { BirthdayType } from './add-birthday.type'
 import { onLoad } from '@dcloudio/uni-app'
 
 import calendar from 'js-calendar-converter'
@@ -81,7 +80,7 @@ import {
   lunarMonthOptions,
   lunarDayOptions,
 } from '@/utils/common'
-import { RemindeType } from '@/types/common'
+import { BirthdayType, RemindeType } from '@/types/common'
 
 let birthdayId = ref('')
 
@@ -118,11 +117,9 @@ const formData = ref({
   comment: '',
 })
 
-let lunarYear = ref('')
+let lunarYear = ref(undefined as any)
 let lunarMonth = ref('')
-let lunarDay = ref('')
-
-console.log(calendar.lunar2solar(2024, '02', 29))
+let lunarDay = ref(undefined as any)
 
 const rules = {
   name: {
@@ -149,8 +146,6 @@ const rules = {
 const formRef = ref(null) as any
 
 const checkForm = (val: any): boolean => {
-  console.log(val.birthdayType)
-
   if (val.birthdayType === BirthdayType.LUNAR) {
     if (!lunarYear.value || !lunarMonth.value || !lunarDay.value) {
       uni.showToast({
@@ -181,7 +176,6 @@ const checkForm = (val: any): boolean => {
 
 const submit = async () => {
   const val = await formRef.value?.validate()
-  console.log(val)
 
   if (!checkForm(val)) {
     return
@@ -256,6 +250,13 @@ const getBirthdayDetail = async (id: string) => {
 
     // 设置表单数据
     formData.value = res.data
+
+    if (res.data.birthdayType === BirthdayType.LUNAR) {
+      const lunarDate = res.data.birthday.split('-')
+      lunarYear.value = Number(lunarDate[0])
+      lunarMonth.value = lunarDate[1]
+      lunarDay.value = Number(lunarDate[2])
+    }
   } catch (e) {
     uni.showToast({
       title: '获取生日详情失败',

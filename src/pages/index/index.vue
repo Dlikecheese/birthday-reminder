@@ -23,6 +23,8 @@ import { onMounted, ref, type Ref } from 'vue'
 import { isLogin, toLogin } from '@/utils/util'
 import { http } from '@/utils/http'
 import dayjs from 'dayjs'
+import { BirthdayType } from '@/types/common'
+import calendar from 'js-calendar-converter'
 
 const info: Ref<{
   lunar: boolean
@@ -62,7 +64,7 @@ const getBirthdayList = async () => {
   info.value.selected = res.data?.map((item: any) => {
     return {
       ...item,
-      date: getCurrentYearBirthday(item.birthday),
+      date: getCurrentYearBirthday(item.birthday, item.birthdayType),
       info: `${item.name}生日`,
     }
   })
@@ -72,9 +74,19 @@ const getBirthdayList = async () => {
   })
 }
 
-const getCurrentYearBirthday = (birthday: string) => {
-  const birthdayMonth = dayjs(birthday).month()
-  const birthdayDate = dayjs(birthday).date()
+const getCurrentYearBirthday = (birthday: string, birthdayType: BirthdayType) => {
+  let solarBirthday = birthday
+  if (birthdayType === BirthdayType.LUNAR) {
+    const lunarBirthday = birthday.split('-')
+    solarBirthday = calendar.lunar2solar(
+      dayjs().year(),
+      lunarBirthday[1],
+      Number(lunarBirthday[2]),
+    ).date
+  }
+
+  const birthdayMonth = dayjs(solarBirthday).month()
+  const birthdayDate = dayjs(solarBirthday).date()
   const birthdayDateInThisYear = dayjs().set('month', birthdayMonth).set('date', birthdayDate)
 
   return `${birthdayDateInThisYear.format('YYYY-MM-DD')}`
