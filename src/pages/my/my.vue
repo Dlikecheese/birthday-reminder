@@ -57,6 +57,27 @@ const logout = async () => {
 
 const operations = [
   {
+    label: '生日提醒',
+    click: () => {
+      uni.requestSubscribeMessage({
+        tmplIds: [''],
+        success() {
+          uni.showToast({
+            title: '订阅成功',
+            icon: 'success',
+          })
+        },
+        fail() {
+          uni.showToast({
+            title: '订阅失败',
+            icon: 'error',
+          })
+        },
+      })
+    },
+    id: 'info',
+  },
+  {
     label: '我的信息',
     click: () => {
       uni.navigateTo({
