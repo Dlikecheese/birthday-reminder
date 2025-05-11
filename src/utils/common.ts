@@ -217,3 +217,6 @@ export const birthdayTypes = [
   { value: BirthdayType.SOLAR, text: '公历' },
   { value: BirthdayType.LUNAR, text: '农历' },
 ]
+
+/** 模版id */
+export const TEMPLATE_ID = 'W59KBTRvjiLU3ikC_IYIv2XRm0rTwxl7uxbBj8EbHD8'

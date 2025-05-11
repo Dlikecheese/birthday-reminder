@@ -4,6 +4,28 @@ import defaultAvatar from '@/static/images/default-avatar.jpeg'
 import { ref } from 'vue'
 import { wxLogin } from '@/utils/util'
 import { http } from '@/utils/http'
+import { onLoad } from '@dcloudio/uni-app'
+import { TEMPLATE_ID } from '@/utils/common'
+
+onLoad(() => {
+  uni.getSetting({
+    withSubscriptions: true,
+    success(res) {
+      const status = res.subscriptionsSetting.itemSettings?.[TEMPLATE_ID]
+      if (status === 'accept') {
+        setSubscribeStatus(true, '已订阅')
+      }
+    },
+  })
+})
+
+const setSubscribeStatus = (disbled: boolean, text: string) => {
+  const subscribeOps = operations.value.find((ele) => ele.id === 'subscribe')
+  if (subscribeOps) {
+    subscribeOps.disbled = disbled
+    subscribeOps.disabledTip = text
+  }
+}
 
 const isLogin = ref(!!useUserStore()?.profile?.token)
 // 默认为默认头像和默认名称
@@ -55,17 +77,19 @@ const logout = async () => {
   })
 }
 
-const operations = [
+const operations = ref([
   {
     label: '开启生日提醒',
     click: () => {
       uni.requestSubscribeMessage({
-        tmplIds: ['W59KBTRvjiLU3ikC_IYIv2XRm0rTwxl7uxbBj8EbHD8'],
+        tmplIds: [TEMPLATE_ID],
         success() {
           uni.showToast({
             title: '订阅成功',
             icon: 'success',
           })
+
+          setSubscribeStatus(true, '已订阅')
         },
         fail() {
           uni.showToast({
@@ -75,7 +99,9 @@ const operations = [
         },
       })
     },
-    id: 'info',
+    id: 'subscribe',
+    disbled: false,
+    disabledTip: '',
   },
   {
     label: '我的生日',
@@ -85,6 +111,8 @@ const operations = [
       })
     },
     id: 'info',
+    disbled: false,
+    disabledTip: '',
   },
   {
     label: '提个意见',
@@ -94,8 +122,10 @@ const operations = [
       })
     },
     id: 'feedback',
+    disbled: false,
+    disabledTip: '',
   },
-]
+])
 </script>
 
 <template>
@@ -121,7 +151,10 @@ const operations = [
     <view v-for="item in operations" :key="item.id" class="operation-item-wrap" @click="item.click">
       <view class="flex items-center justify-between">
         <view class="left">{{ item.label }}</view>
-        <view class="right" @click="item.click">></view>
+        <view class="right" @click="item.click">
+          <text v-if="!item.disbled">></text>
+          <text v-else>{{ item.disabledTip }}</text>
+        </view>
       </view>
     </view>
   </view>
