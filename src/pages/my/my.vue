@@ -19,10 +19,10 @@ onLoad(() => {
   })
 })
 
-const setSubscribeStatus = (disbled: boolean, text: string) => {
+const setSubscribeStatus = (disabled: boolean, text: string) => {
   const subscribeOps = operations.value.find((ele) => ele.id === 'subscribe')
   if (subscribeOps) {
-    subscribeOps.disbled = disbled
+    subscribeOps.disabled = disabled
     subscribeOps.disabledTip = text
   }
 }
@@ -80,16 +80,20 @@ const logout = async () => {
 const operations = ref([
   {
     label: '开启生日提醒',
-    click: () => {
+    click: (item?: any) => {
+      if (item.disabled) {
+        return
+      }
       uni.requestSubscribeMessage({
         tmplIds: [TEMPLATE_ID],
-        success() {
-          uni.showToast({
-            title: '订阅成功',
-            icon: 'success',
-          })
-
-          setSubscribeStatus(true, '已订阅')
+        success(res: any) {
+          if (res[TEMPLATE_ID] === 'accept') {
+            setSubscribeStatus(true, '已订阅')
+            uni.showToast({
+              title: '订阅成功',
+              icon: 'success',
+            })
+          }
         },
         fail() {
           uni.showToast({
@@ -100,18 +104,21 @@ const operations = ref([
       })
     },
     id: 'subscribe',
-    disbled: false,
+    disabled: false,
     disabledTip: '',
   },
   {
     label: '我的生日',
-    click: () => {
+    click: (item?: any) => {
+      if (item.disabled) {
+        return
+      }
       uni.navigateTo({
         url: '/pagesMy/edit-info/edit-info',
       })
     },
     id: 'info',
-    disbled: false,
+    disabled: false,
     disabledTip: '',
   },
   {
@@ -122,7 +129,7 @@ const operations = ref([
       })
     },
     id: 'feedback',
-    disbled: false,
+    disabled: false,
     disabledTip: '',
   },
 ])
@@ -148,11 +155,11 @@ const operations = ref([
   </uni-card>
 
   <view class="operation-wrap" v-if="isLogin">
-    <view v-for="item in operations" :key="item.id" class="operation-item-wrap" @click="item.click">
-      <view class="flex items-center justify-between">
+    <view v-for="item in operations" :key="item.id" class="operation-item-wrap">
+      <view @click="item.click(item)" class="flex items-center justify-between">
         <view class="left">{{ item.label }}</view>
-        <view class="right" @click="item.click">
-          <text v-if="!item.disbled">></text>
+        <view class="right">
+          <text v-if="!item.disabled" @click="item.click">></text>
           <text v-else>{{ item.disabledTip }}</text>
         </view>
       </view>

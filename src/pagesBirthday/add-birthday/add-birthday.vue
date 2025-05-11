@@ -58,7 +58,11 @@
     <view class="box"></view>
     <view class="submit flex">
       <uni-icons type="trash" size="30" color="#9e9e9e" v-if="birthdayId" @click="remove" />
-      <button @click="submit" class="submit-btn color-theme-bg text-light">
+      <button
+        @click="submit"
+        class="submit-btn color-theme-bg text-light"
+        :class="{ 'w-full': !showShareBtn }"
+      >
         {{ birthdayId ? '修改' : '添加' }}
       </button>
       <button v-if="showShareBtn" open-type="share" class="share-btn text-light">分享</button>
@@ -83,16 +87,25 @@ import {
   birthdayTypes,
 } from '@/utils/common'
 import { BirthdayType, RemindeType } from '@/types/common'
+import { isLogin, toLogin } from '@/utils/util'
 
 let birthdayId = ref('')
 let showShareBtn = ref(false)
 
 onLoad(async ({ id, shareData }: any) => {
+  await checkLogin()
   if (shareData) {
-    showShareBtn.value = true
+    showShareBtn.value = false
     try {
       const data = JSON.parse(shareData)
       formData.value = data
+
+      if (data.birthdayType === BirthdayType.LUNAR) {
+        const lunarDate = data.birthday.split('-')
+        lunarYear.value = Number(lunarDate[0])
+        lunarMonth.value = lunarDate[1]
+        lunarDay.value = Number(lunarDate[2])
+      }
     } catch (error) {
       uni.showToast({
         title: '分享数据格式错误',
@@ -118,6 +131,16 @@ onLoad(async ({ id, shareData }: any) => {
     uni.hideLoading()
   }
 })
+
+const checkLogin = async () => {
+  if (!isLogin()) {
+    try {
+      await toLogin()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
 
 const formData = ref({
   name: '',
@@ -243,7 +266,8 @@ const submit = async () => {
       }, 200)
     })
     uni.setStorageSync('refresh', true)
-    uni.navigateBack()
+
+    uni.switchTab({ url: '/pages/birthday/birthday' })
   } catch (error) {
     uni.showToast({
       title: '操作失败',
@@ -306,7 +330,15 @@ const remove = () => {
 }
 
 onShareAppMessage(() => {
-  const data = JSON.stringify(formData.value)
+  const params = {
+    ...formData.value,
+    birthday:
+      formData.value.birthdayType === BirthdayType.SOLAR
+        ? formData.value.birthday
+        : `${lunarYear.value}-${lunarMonth.value}-${lunarDay.value}`,
+  }
+  const data = JSON.stringify(params)
+
   return {
     title: '分享了一个生日给你',
     path: `/pagesBirthday/add-birthday/add-birthday?shareData=${data}`, // 分享路径
@@ -326,7 +358,7 @@ onShareAppMessage(() => {
   align-items: center;
   z-index: 98;
   .submit-btn {
-    width: 80%;
+    width: 40%;
   }
 }
 .box {
@@ -337,7 +369,7 @@ onShareAppMessage(() => {
 
 .share-btn {
   margin-left: 10px;
-  width: 20%;
+  width: 40%;
   background-color: #4fae70;
   color: #fff;
   text-align: center;
