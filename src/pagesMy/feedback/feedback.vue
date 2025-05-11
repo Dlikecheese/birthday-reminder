@@ -29,7 +29,7 @@ const add = async () => {
   }
 
   await http({
-    url: '/user/feedback',
+    url: '/feedback/add',
     method: 'POST',
     data: {
       content: baseFormData.value.content,

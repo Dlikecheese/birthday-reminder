@@ -77,16 +77,29 @@ const logout = async () => {
   })
 }
 
+let isSubscribing = false // 全局标记是否正在订阅
 const operations = ref([
   {
-    label: '开启生日提醒',
+    label: '订阅生日提醒',
     click: (item?: any) => {
       if (item.disabled) {
         return
       }
+
+      if (isSubscribing) {
+        uni.showToast({
+          title: '正在订阅中，请稍后',
+          icon: 'none',
+        })
+        return
+      }
+
+      isSubscribing = true
+
       uni.requestSubscribeMessage({
         tmplIds: [TEMPLATE_ID],
         success(res: any) {
+          uni.hideLoading()
           if (res[TEMPLATE_ID] === 'accept') {
             setSubscribeStatus(true, '已订阅')
             uni.showToast({
@@ -100,6 +113,9 @@ const operations = ref([
             title: '订阅失败',
             icon: 'error',
           })
+        },
+        complete: () => {
+          isSubscribing = false
         },
       })
     },
