@@ -61,6 +61,7 @@
       <button @click="submit" class="submit-btn color-theme-bg text-light">
         {{ birthdayId ? '修改' : '添加' }}
       </button>
+      <button v-if="showShareBtn" open-type="share" class="share-btn text-light">分享</button>
     </view>
   </div>
 </template>
@@ -68,7 +69,7 @@
 <script lang="ts" setup>
 import { http } from '@/utils/http'
 import { ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShareAppMessage } from '@dcloudio/uni-app'
 
 import calendar from 'js-calendar-converter'
 
@@ -83,9 +84,24 @@ import {
 import { BirthdayType, RemindeType } from '@/types/common'
 
 let birthdayId = ref('')
+let showShareBtn = ref(false)
 
-onLoad(async ({ id }: any) => {
+onLoad(async ({ id, shareData }: any) => {
+  if (shareData) {
+    showShareBtn.value = true
+    try {
+      const data = JSON.parse(shareData)
+      formData.value = data
+    } catch (error) {
+      uni.showToast({
+        title: '分享数据格式错误',
+        icon: 'error',
+      })
+    }
+  }
+
   if (id) {
+    showShareBtn.value = true
     uni.setNavigationBarTitle({
       title: '编辑生日提醒',
     })
@@ -292,6 +308,15 @@ const remove = () => {
     },
   })
 }
+
+onShareAppMessage(() => {
+  //在这里自定义你的分享内容
+  const data = JSON.stringify(formData.value)
+  return {
+    title: '分享了一个生日给你',
+    path: `/pagesBirthday/add-birthday/add-birthday?shareData=${data}`, // 分享路径
+  }
+})
 </script>
 
 <style lang="scss">
@@ -313,5 +338,13 @@ const remove = () => {
   margin-bottom: 24px;
   width: 100%;
   height: 50px;
+}
+
+.share-btn {
+  margin-left: 10px;
+  width: 20%;
+  background-color: #4fae70;
+  color: #fff;
+  text-align: center;
 }
 </style>
