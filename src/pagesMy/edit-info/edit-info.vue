@@ -182,7 +182,7 @@ onShareAppMessage(() => {
   align-items: center;
   z-index: 98;
   .submit-btn {
-    width: 80%;
+    width: 40%;
   }
 }
 .box {
@@ -192,7 +192,7 @@ onShareAppMessage(() => {
 }
 .share-btn {
   margin-left: 10px;
-  width: 20%;
+  width: 40%;
   background-color: #4fae70;
   color: #fff;
   text-align: center;
