@@ -1,4 +1,4 @@
-import { AgeRange, Relation, RemindeType, Sex } from '@/types/common'
+import { AgeRange, BirthdayType, Relation, RemindeType, Sex } from '@/types/common'
 
 export const usageAgeOptions = [
   { value: AgeRange.ALL, text: '通用' },
@@ -211,4 +211,9 @@ export const lunarDayOptions = [
     value: 30,
     text: '三十',
   },
+]
+
+export const birthdayTypes = [
+  { value: BirthdayType.SOLAR, text: '公历' },
+  { value: BirthdayType.LUNAR, text: '农历' },
 ]

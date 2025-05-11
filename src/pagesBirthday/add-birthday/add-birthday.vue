@@ -80,6 +80,7 @@ import {
   lunarYearOptions,
   lunarMonthOptions,
   lunarDayOptions,
+  birthdayTypes,
 } from '@/utils/common'
 import { BirthdayType, RemindeType } from '@/types/common'
 
@@ -117,11 +118,6 @@ onLoad(async ({ id, shareData }: any) => {
     uni.hideLoading()
   }
 })
-
-const birthdayTypes = [
-  { value: BirthdayType.SOLAR, text: '公历' },
-  { value: BirthdayType.LUNAR, text: '农历' },
-]
 
 const formData = ref({
   name: '',
@@ -310,7 +306,6 @@ const remove = () => {
 }
 
 onShareAppMessage(() => {
-  //在这里自定义你的分享内容
   const data = JSON.stringify(formData.value)
   return {
     title: '分享了一个生日给你',

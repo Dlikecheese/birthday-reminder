@@ -4,8 +4,35 @@
       <uni-forms-item label="昵称" name="name" required>
         <uni-easyinput type="text" v-model="formData.name" placeholder="请输入昵称" />
       </uni-forms-item>
-      <uni-forms-item label="生日" name="birthday">
+      <uni-forms-item label="生日" name="birthdayType" required>
+        <uni-data-checkbox
+          v-model="formData.birthdayType"
+          :localdata="birthdayTypes"
+        ></uni-data-checkbox>
+      </uni-forms-item>
+      <uni-forms-item label=" " v-if="formData.birthdayType === BirthdayType.SOLAR" name="birthday">
         <uni-datetime-picker type="date" v-model="formData.birthday"></uni-datetime-picker>
+      </uni-forms-item>
+      <uni-forms-item label=" " v-else>
+        <view class="flex flex-col gap-2">
+          <uni-data-select
+            v-model="lunarYear"
+            :localdata="lunarYearOptions"
+            placeholder="请选择农历年"
+          ></uni-data-select>
+
+          <uni-data-select
+            v-model="lunarMonth"
+            :localdata="lunarMonthOptions"
+            placeholder="请选择农历月"
+          ></uni-data-select>
+
+          <uni-data-select
+            v-model="lunarDay"
+            :localdata="lunarDayOptions"
+            placeholder="请选择农历日"
+          ></uni-data-select>
+        </view>
       </uni-forms-item>
 
       <uni-forms-item label="性别" name="sex">
@@ -15,6 +42,7 @@
     <view class="box"></view>
     <view class="submit flex">
       <button @click="submit" class="submit-btn color-theme-bg text-light">修改</button>
+      <button open-type="share" class="share-btn text-light">分享</button>
     </view>
   </div>
 </template>
@@ -22,9 +50,14 @@
 <script lang="ts" setup>
 import { http } from '@/utils/http'
 import { ref } from 'vue'
-import { Sex } from '@/types/common'
-import { onShow } from '@dcloudio/uni-app'
+import { BirthdayType, Sex } from '@/types/common'
+import { onShow, onShareAppMessage } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/index'
+import { birthdayTypes, lunarYearOptions, lunarMonthOptions, lunarDayOptions } from '@/utils/common'
+
+let lunarYear = ref(undefined as any)
+let lunarMonth = ref('')
+let lunarDay = ref(undefined as any)
 
 onShow(async () => {
   uni.showLoading({
@@ -44,6 +77,7 @@ const formData = ref({
   name: '',
   sex: '',
   birthday: '',
+  birthdayType: BirthdayType.SOLAR,
 })
 
 const rules = {
@@ -112,6 +146,13 @@ const getUserDetail = async () => {
 
     // 设置表单数据
     formData.value = res.data
+
+    if (res.data.birthdayType === BirthdayType.LUNAR) {
+      const lunarDate = res.data.birthday.split('-')
+      lunarYear.value = Number(lunarDate[0])
+      lunarMonth.value = lunarDate[1]
+      lunarDay.value = Number(lunarDate[2])
+    }
   } catch (e) {
     uni.showToast({
       title: '获取用户详情失败',
@@ -119,6 +160,14 @@ const getUserDetail = async () => {
     })
   }
 }
+
+onShareAppMessage(() => {
+  const data = JSON.stringify(formData.value)
+  return {
+    title: '分享了一个生日给你',
+    path: `/pagesBirthday/add-birthday/add-birthday?shareData=${data}`, // 分享路径
+  }
+})
 </script>
 
 <style lang="scss">
@@ -140,5 +189,12 @@ const getUserDetail = async () => {
   margin-bottom: 24px;
   width: 100%;
   height: 50px;
+}
+.share-btn {
+  margin-left: 10px;
+  width: 20%;
+  background-color: #4fae70;
+  color: #fff;
+  text-align: center;
 }
 </style>

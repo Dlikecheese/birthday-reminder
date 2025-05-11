@@ -57,10 +57,10 @@ const logout = async () => {
 
 const operations = [
   {
-    label: '生日提醒',
+    label: '开启生日提醒',
     click: () => {
       uni.requestSubscribeMessage({
-        tmplIds: [''],
+        tmplIds: ['W59KBTRvjiLU3ikC_IYIv2XRm0rTwxl7uxbBj8EbHD8'],
         success() {
           uni.showToast({
             title: '订阅成功',
@@ -78,7 +78,7 @@ const operations = [
     id: 'info',
   },
   {
-    label: '我的信息',
+    label: '我的生日',
     click: () => {
       uni.navigateTo({
         url: '/pagesMy/edit-info/edit-info',
