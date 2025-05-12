@@ -12,11 +12,7 @@
             <uni-card is-full :is-shadow="false" @click="onEdit(item.id)">
               <view class="flex justify-between">
                 <view class="flex gap-2">
-                  <image
-                    src="@/static/images/default-avatar.jpeg"
-                    mode="scaleToFill"
-                    class="avatar"
-                  />
+                  <image src="@/static/tabs/cake-fill.png" mode="scaleToFill" class="avatar" />
                   <view class="flex flex-col gap-base">
                     <view class="text-primary font-bolder">{{ item.name }}</view>
                     <view>{{ item.desc }}</view>
@@ -52,11 +48,7 @@
             <uni-card is-full :is-shadow="false" @click="onEdit(item.id)">
               <view class="flex justify-between">
                 <view class="flex gap-2">
-                  <image
-                    src="@/static/images/default-avatar.jpeg"
-                    mode="scaleToFill"
-                    class="avatar"
-                  />
+                  <image src="@/static/tabs/cake-fill.png" mode="scaleToFill" class="avatar" />
                   <view class="flex flex-col gap-base">
                     <view class="text-primary font-bolder">{{ item.name }}</view>
                     <view>{{ item.desc }}</view>
@@ -333,9 +325,8 @@ const swipeClick = (e: any, item: any) => {
 }
 
 .avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 45px;
+  height: 45px;
 }
 
 .no-data {
