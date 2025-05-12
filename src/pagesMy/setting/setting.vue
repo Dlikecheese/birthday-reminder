@@ -1,48 +1,17 @@
 <template>
   <div class="card">
+    <button class="avatar-wrapper" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
+      <image class="avatar" :src="avatarUrlSrc" v-if="avatarUrlSrc"></image>
+      <image class="avatar" :src="defaultAvatar" v-else></image>
+    </button>
     <uni-forms ref="formRef" :modelValue="formData" :rules="rules">
       <uni-forms-item label="昵称" name="name" required>
         <uni-easyinput type="text" v-model="formData.name" placeholder="请输入昵称" />
-      </uni-forms-item>
-      <uni-forms-item label="生日" name="birthdayType" required>
-        <uni-data-checkbox
-          v-model="formData.birthdayType"
-          :localdata="birthdayTypes"
-        ></uni-data-checkbox>
-      </uni-forms-item>
-      <uni-forms-item label=" " v-if="formData.birthdayType === BirthdayType.SOLAR" name="birthday">
-        <uni-datetime-picker type="date" v-model="formData.birthday"></uni-datetime-picker>
-      </uni-forms-item>
-      <uni-forms-item label=" " v-else>
-        <view class="flex flex-col gap-2">
-          <uni-data-select
-            v-model="lunarYear"
-            :localdata="lunarYearOptions"
-            placeholder="请选择农历年"
-          ></uni-data-select>
-
-          <uni-data-select
-            v-model="lunarMonth"
-            :localdata="lunarMonthOptions"
-            placeholder="请选择农历月"
-          ></uni-data-select>
-
-          <uni-data-select
-            v-model="lunarDay"
-            :localdata="lunarDayOptions"
-            placeholder="请选择农历日"
-          ></uni-data-select>
-        </view>
-      </uni-forms-item>
-
-      <uni-forms-item label="性别" name="sex">
-        <uni-data-select v-model="formData.sex" :localdata="sexOptions"></uni-data-select>
       </uni-forms-item>
     </uni-forms>
     <view class="box"></view>
     <view class="submit flex">
       <button @click="submit" class="submit-btn color-theme-bg text-light">修改</button>
-      <button open-type="share" class="share-btn text-light">分享</button>
     </view>
   </div>
 </template>
@@ -50,14 +19,11 @@
 <script lang="ts" setup>
 import { http } from '@/utils/http'
 import { ref } from 'vue'
-import { BirthdayType, Sex } from '@/types/common'
-import { onShow, onShareAppMessage } from '@dcloudio/uni-app'
+import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/index'
-import { birthdayTypes, lunarYearOptions, lunarMonthOptions, lunarDayOptions } from '@/utils/common'
+import defaultAvatar from '@/static/images/default-avatar.jpeg'
 
-let lunarYear = ref(undefined as any)
-let lunarMonth = ref('')
-let lunarDay = ref(undefined as any)
+const avatarUrlSrc = ref('')
 
 onShow(async () => {
   uni.showLoading({
@@ -68,16 +34,8 @@ onShow(async () => {
   uni.hideLoading()
 })
 
-const sexOptions = [
-  { value: Sex.MALE, text: '男' },
-  { value: Sex.FEMALE, text: '女' },
-]
-
 const formData = ref({
   name: '',
-  sex: '',
-  birthday: '',
-  birthdayType: BirthdayType.SOLAR,
 })
 
 const rules = {
@@ -103,6 +61,10 @@ const rules = {
 
 // 引用表单
 const formRef = ref(null) as any
+const onChooseAvatar = (e: any) => {
+  const { avatarUrl } = e.detail
+  avatarUrlSrc.value = avatarUrl
+}
 
 const submit = async () => {
   try {
@@ -111,12 +73,16 @@ const submit = async () => {
     await http({
       url: '/user/' + userStore.profile.id,
       method: 'PUT',
-      data: val,
+      data: {
+        ...val,
+        avatar: avatarUrlSrc.value,
+      },
     })
 
     userStore.setProfile({
       ...userStore.profile,
       ...val,
+      avatar: avatarUrlSrc.value,
     })
 
     uni.showToast({
@@ -126,8 +92,9 @@ const submit = async () => {
     await new Promise((resolve) => {
       setTimeout(() => {
         resolve('')
-      }, 200)
+      }, 800)
     })
+
     uni.navigateBack()
   } catch (error) {
     uni.showToast({
@@ -146,28 +113,15 @@ const getUserDetail = async () => {
 
     // 设置表单数据
     formData.value = res.data
-
-    if (res.data.birthdayType === BirthdayType.LUNAR) {
-      const lunarDate = res.data.birthday.split('-')
-      lunarYear.value = Number(lunarDate[0])
-      lunarMonth.value = lunarDate[1]
-      lunarDay.value = Number(lunarDate[2])
-    }
+    avatarUrlSrc.value = res.data.avatar
   } catch (e) {
+    console.error('获取用户详情失败', e)
     uni.showToast({
       title: '获取用户详情失败',
       icon: 'error',
     })
   }
 }
-
-onShareAppMessage(() => {
-  const data = JSON.stringify(formData.value)
-  return {
-    title: '分享了一个生日给你',
-    path: `/pagesBirthday/add-birthday/add-birthday?shareData=${data}`, // 分享路径
-  }
-})
 </script>
 
 <style lang="scss">
@@ -182,7 +136,7 @@ onShareAppMessage(() => {
   align-items: center;
   z-index: 98;
   .submit-btn {
-    width: 40%;
+    width: 100%;
   }
 }
 .box {
@@ -190,11 +144,15 @@ onShareAppMessage(() => {
   width: 100%;
   height: 50px;
 }
-.share-btn {
-  margin-left: 10px;
-  width: 40%;
-  background-color: #4fae70;
-  color: #fff;
-  text-align: center;
+.avatar {
+  width: 56px;
+  height: 56px;
+}
+.avatar-wrapper {
+  padding: 0;
+  width: 56px !important;
+  border-radius: 8px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 </style>

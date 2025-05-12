@@ -35,7 +35,7 @@ let displayedName = ref('微信用户')
 const { name, avatar } = useUserStore()?.profile ?? {}
 
 if (isLogin.value) {
-  displayedAvatarUrl.value = avatar
+  displayedAvatarUrl.value = avatar || defaultAvatar
   displayedName.value = name
 }
 
@@ -124,20 +124,6 @@ const operations = ref([
     disabledTip: '',
   },
   {
-    label: '我的生日',
-    click: (item?: any) => {
-      if (item.disabled) {
-        return
-      }
-      uni.navigateTo({
-        url: '/pagesMy/edit-info/edit-info',
-      })
-    },
-    id: 'info',
-    disabled: false,
-    disabledTip: '',
-  },
-  {
     label: '提个意见',
     click: () => {
       uni.navigateTo({
@@ -145,6 +131,17 @@ const operations = ref([
       })
     },
     id: 'feedback',
+    disabled: false,
+    disabledTip: '',
+  },
+  {
+    label: '设置',
+    click: () => {
+      uni.navigateTo({
+        url: '/pagesMy/setting/setting',
+      })
+    },
+    id: 'setting',
     disabled: false,
     disabledTip: '',
   },
@@ -185,9 +182,9 @@ const operations = ref([
 
 <style lang="scss">
 .avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
 }
 
 .username {
