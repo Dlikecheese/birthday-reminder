@@ -19,12 +19,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import { isLogin, toLogin } from '@/utils/util'
 import { http } from '@/utils/http'
 import dayjs from 'dayjs'
 import { BirthdayType } from '@/types/common'
 import calendar from 'js-calendar-converter'
+import { onShow } from '@dcloudio/uni-app'
 
 const info: Ref<{
   lunar: boolean
@@ -50,7 +51,7 @@ const monthSwith = (e: any) => {
   noticeText = `本月有 ${birthdaysInCurrentMonth.value.length} 个生日`
 }
 
-onMounted(async () => {
+onShow(async () => {
   await checkLogin()
   getBirthdayList()
 })
