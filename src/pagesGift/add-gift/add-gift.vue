@@ -191,7 +191,7 @@ const sendAddRequest = async (params: any) => {
   await new Promise((resolve) => {
     setTimeout(() => {
       resolve('')
-    }, 200)
+    }, 800)
   })
   uni.setStorageSync('refresh', true)
   uni.navigateBack()
@@ -229,7 +229,7 @@ const submit = async () => {
       await new Promise((resolve) => {
         setTimeout(() => {
           resolve('')
-        }, 200)
+        }, 800)
       })
 
       uni.setStorageSync('refresh', true)

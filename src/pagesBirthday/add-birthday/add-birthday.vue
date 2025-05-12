@@ -242,7 +242,7 @@ const submit = async () => {
       await new Promise((resolve) => {
         setTimeout(() => {
           resolve('')
-        }, 200)
+        }, 800)
       })
 
       uni.setStorageSync('refresh', true)
@@ -263,7 +263,7 @@ const submit = async () => {
     await new Promise((resolve) => {
       setTimeout(() => {
         resolve('')
-      }, 200)
+      }, 800)
     })
     uni.setStorageSync('refresh', true)
 
