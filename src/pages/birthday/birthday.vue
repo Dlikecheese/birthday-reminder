@@ -1,74 +1,14 @@
 <template>
   <view v-if="!loading && birthdayList.length">
-    <uni-section title="一个月内生日" type="line">
-      <view v-if="birthdayLatestList.length">
-        <uni-swipe-action>
-          <uni-swipe-action-item
-            v-for="item in birthdayLatestList"
-            :key="item.id"
-            :right-options="item.options"
-            @click="swipeClick($event, item)"
-          >
-            <uni-card is-full :is-shadow="false" @click="onEdit(item.id)">
-              <view class="flex justify-between">
-                <view class="flex gap-2">
-                  <image src="@/static/tabs/cake-fill.png" mode="scaleToFill" class="avatar" />
-                  <view class="flex flex-col gap-base">
-                    <view class="text-primary font-bolder">{{ item.name }}</view>
-                    <view>{{ item.desc }}</view>
-                  </view>
-                </view>
-
-                <view class="flex flex-col gap-1 items-end">
-                  <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
-                  <view>距{{ item.nextAge }}岁生日</view>
-                </view>
-              </view>
-            </uni-card>
-          </uni-swipe-action-item>
-        </uni-swipe-action>
-      </view>
-
-      <view v-else>
-        <view class="flex justify-center">
-          <view class="text-weaken">近期暂无生日</view>
-        </view>
+    <uni-section title="一个月内生日" type="line" v-if="birthdayLatestList.length">
+      <view>
+        <birthday-item :list="birthdayLatestList" @delete="getBirthdayList"></birthday-item>
       </view>
     </uni-section>
 
-    <uni-section title="一个月后过生日" type="line">
-      <view v-if="birthdayAfterOneMonthList.length">
-        <uni-swipe-action>
-          <uni-swipe-action-item
-            v-for="item in birthdayAfterOneMonthList"
-            :key="item.id"
-            :right-options="item.options"
-            @click="swipeClick($event, item)"
-          >
-            <uni-card is-full :is-shadow="false" @click="onEdit(item.id)">
-              <view class="flex justify-between">
-                <view class="flex gap-2">
-                  <image src="@/static/tabs/cake-fill.png" mode="scaleToFill" class="avatar" />
-                  <view class="flex flex-col gap-base">
-                    <view class="text-primary font-bolder">{{ item.name }}</view>
-                    <view>{{ item.desc }}</view>
-                  </view>
-                </view>
-
-                <view class="flex flex-col gap-1 items-end">
-                  <view class="color-theme font-bolder text-larger">{{ item.countdown }}</view>
-                  <view>距{{ item.nextAge }}岁生日</view>
-                </view>
-              </view>
-            </uni-card>
-          </uni-swipe-action-item>
-        </uni-swipe-action>
-      </view>
-
-      <view v-else>
-        <view class="flex justify-center">
-          <view class="text-weaken">一个月后暂无生日</view>
-        </view>
+    <uni-section title="一个月后生日" type="line" v-if="birthdayAfterOneMonthList.length">
+      <view>
+        <birthday-item :list="birthdayAfterOneMonthList" @delete="getBirthdayList"></birthday-item>
       </view>
     </uni-section>
   </view>
@@ -81,8 +21,10 @@
 </template>
 
 <script lang="ts" setup>
+import { BirthdayType } from '@/types/common'
+import { lunarDayOptions, lunarMonthOptions } from '@/utils/common'
 import { http } from '@/utils/http'
-import { calculateZodiac, isLogin, toLogin } from '@/utils/util'
+import { calculateSolarBirthday, calculateZodiac, isLogin, toLogin } from '@/utils/util'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import dayjs from 'dayjs'
 import { onMounted, ref } from 'vue'
@@ -150,17 +92,19 @@ const getBirthdayList = async () => {
     })
 
     birthdayList.value = res.data
-    const latestList = res.data.filter(
-      (ele: { birthday: string | number | Date | dayjs.Dayjs | null | undefined }) => {
-        const birthdayMonth = dayjs(ele.birthday).month()
-        const birthdayDate = dayjs(ele.birthday).date()
-        const birthdayDateInThisYear = dayjs().set('month', birthdayMonth).set('date', birthdayDate)
-        return (
-          birthdayDateInThisYear.diff(dayjs(), 'day') <= 30 &&
-          birthdayDateInThisYear.diff(dayjs(), 'day') >= 0
-        )
-      },
-    )
+    const latestList = res.data.filter((ele: { birthday: string; birthdayType: BirthdayType }) => {
+      const birthdayMonth = dayjs(ele.birthday).month()
+      const birthdayDate = dayjs(ele.birthday).date()
+
+      let birthdayDateInThisYear = dayjs().set('month', birthdayMonth).set('date', birthdayDate)
+      if (ele.birthdayType === BirthdayType.LUNAR) {
+        birthdayDateInThisYear = dayjs(calculateSolarBirthday(ele.birthday))
+      }
+      return (
+        birthdayDateInThisYear.diff(dayjs(), 'day') <= 30 &&
+        birthdayDateInThisYear.diff(dayjs(), 'day') >= 0
+      )
+    })
 
     const otherList = res.data.filter((ele: { id: any }) => {
       return !latestList.some((item: { id: any }) => item.id === ele.id)
@@ -183,17 +127,29 @@ const transformBirthday = (birthdayList: any[]): any[] => {
   return birthdayList
     .map((ele) => {
       const nextAge = dayjs().diff(ele.birthday, 'year') + 1
-      const zodiac = calculateZodiac(ele.birthday)
-      const desc = `${dayjs(ele.birthday).format('MM月DD日')} 属${zodiac} ${nextAge}岁`
+      const zodiac = calculateZodiac(ele)
 
-      const countdown = calcCountdown(ele.birthday).text
+      let desc = `${dayjs(ele.birthday).format('MM月DD日')} 属${zodiac} ${nextAge}岁`
+      if (ele.birthdayType === BirthdayType.LUNAR) {
+        const dateArr = ele.birthday.split('-')
+        const lunarMonth = lunarMonthOptions.find((item) => item.value === dateArr[1])?.text
+        const lunarDate = lunarDayOptions.find((item) => item.value === Number(dateArr[2]))?.text
+        desc = `农历${lunarMonth}${lunarDate} 属${zodiac} ${nextAge}岁`
+      }
+
+      const solarBirthday =
+        ele.birthdayType === BirthdayType.LUNAR
+          ? calculateSolarBirthday(ele.birthday)
+          : ele.birthday
+
+      const countdown = calcCountdown(solarBirthday).text
       return {
         ...ele,
         nextAge,
         desc,
         countdown,
         options: swipeAction,
-        diffDays: calcCountdown(ele.birthday).days,
+        diffDays: calcCountdown(solarBirthday).days,
       }
     })
     .sort((a, b) => {
@@ -237,7 +193,7 @@ const calcCountdown = (
  * 获取倒计时文本
  */
 const getDiffText = (diff: number): string => {
-  if (diff === 0) {
+  if (diff === 0 || diff === 365) {
     return '今天'
   } else if (diff === 1) {
     return '明天'

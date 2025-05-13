@@ -19,12 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
-import { isLogin, toLogin } from '@/utils/util'
+import { onMounted, ref, type Ref } from 'vue'
+import { calculateSolarBirthday, isLogin, toLogin } from '@/utils/util'
 import { http } from '@/utils/http'
 import dayjs from 'dayjs'
 import { BirthdayType } from '@/types/common'
-import calendar from 'js-calendar-converter'
 import { onShow } from '@dcloudio/uni-app'
 
 const info: Ref<{
@@ -51,6 +50,11 @@ const monthSwith = (e: any) => {
   noticeText = `本月有 ${birthdaysInCurrentMonth.value.length} 个生日`
 }
 
+onMounted(async () => {
+  await checkLogin()
+  getBirthdayList()
+})
+
 onShow(async () => {
   await checkLogin()
   getBirthdayList()
@@ -62,7 +66,7 @@ const getBirthdayList = async () => {
     method: 'GET',
   })
 
-  info.value.selected = res.data?.map((item: any) => {
+  const birthdays = res.data?.map((item: any) => {
     return {
       ...item,
       date: getCurrentYearBirthday(item.birthday, item.birthdayType),
@@ -70,20 +74,38 @@ const getBirthdayList = async () => {
     }
   })
 
+  setSelected(birthdays)
+
   monthSwith({
     month: dayjs().month() + 1,
   })
 }
 
+const setSelected = (birthdays: any[]): void => {
+  const uniqueBirthday = new Map()
+  birthdays.forEach((item: any) => {
+    const birthday = item.date
+    if (!uniqueBirthday.has(birthday)) {
+      uniqueBirthday.set(birthday, [])
+    }
+    uniqueBirthday.get(birthday).push(item)
+  })
+
+  // 将去重后的对象转换为数组
+  const uniqueBirthdays = Array.from(uniqueBirthday.entries()).map(([birthday, items]) => {
+    return {
+      date: items[0].date,
+      info: items.map((item: any) => item.name).join('、') + '生日',
+    }
+  })
+
+  info.value.selected = uniqueBirthdays
+}
+
 const getCurrentYearBirthday = (birthday: string, birthdayType: BirthdayType) => {
   let solarBirthday = birthday
   if (birthdayType === BirthdayType.LUNAR) {
-    const lunarBirthday = birthday.split('-')
-    solarBirthday = calendar.lunar2solar(
-      dayjs().year(),
-      lunarBirthday[1],
-      Number(lunarBirthday[2]),
-    ).date
+    solarBirthday = calculateSolarBirthday(birthday)
   }
 
   const birthdayMonth = dayjs(solarBirthday).month()
