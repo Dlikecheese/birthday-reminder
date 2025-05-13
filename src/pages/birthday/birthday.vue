@@ -173,6 +173,13 @@ const calcCountdown = (
 
   const now = dayjs()
   let diff = 0
+  if (birthdayDateInThisYear.isSame(now, 'day') && birthdayDateInThisYear.isSame(now, 'month')) {
+    return {
+      text: '今天',
+      days: 0,
+    }
+  }
+
   if (birthdayDateInThisYear.isBefore(dayjs())) {
     const nextBirthday = dayjs()
       .set('year', now.year() + 1)
