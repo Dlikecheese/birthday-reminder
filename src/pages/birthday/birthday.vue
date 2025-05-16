@@ -25,7 +25,7 @@ import { BirthdayType } from '@/types/common'
 import { lunarDayOptions, lunarMonthOptions } from '@/utils/common'
 import { http } from '@/utils/http'
 import { calculateSolarBirthday, calculateZodiac, isLogin, toLogin } from '@/utils/util'
-import { onLoad, onShow } from '@dcloudio/uni-app'
+import { onShow } from '@dcloudio/uni-app'
 import dayjs from 'dayjs'
 import { onMounted, ref } from 'vue'
 
@@ -126,7 +126,18 @@ const getBirthdayList = async () => {
 const transformBirthday = (birthdayList: any[]): any[] => {
   return birthdayList
     .map((ele) => {
-      const nextAge = dayjs().diff(ele.birthday, 'year') + 1
+      const solarBirthday =
+        ele.birthdayType === BirthdayType.LUNAR
+          ? calculateSolarBirthday(ele.birthday)
+          : ele.birthday
+
+      const countdown = calcCountdown(solarBirthday).text
+
+      let nextAge = dayjs().diff(ele.birthday, 'year') + 1
+      if (countdown === '今天') {
+        nextAge = dayjs().diff(ele.birthday, 'year')
+      }
+
       const zodiac = calculateZodiac(ele)
 
       let desc = `${dayjs(ele.birthday).format('MM月DD日')} 属${zodiac} ${nextAge}岁`
@@ -137,12 +148,6 @@ const transformBirthday = (birthdayList: any[]): any[] => {
         desc = `农历${lunarMonth}${lunarDate} 属${zodiac} ${nextAge}岁`
       }
 
-      const solarBirthday =
-        ele.birthdayType === BirthdayType.LUNAR
-          ? calculateSolarBirthday(ele.birthday)
-          : ele.birthday
-
-      const countdown = calcCountdown(solarBirthday).text
       return {
         ...ele,
         nextAge,
@@ -169,6 +174,7 @@ const calcCountdown = (
   // 如果生日的月日小于当前的月日，说明今年的生日已经过了，计算下一年的生日还有多少天
   const birthdayMonth = dayjs(birthday).month()
   const birthdayDate = dayjs(birthday).date()
+
   const birthdayDateInThisYear = dayjs().set('month', birthdayMonth).set('date', birthdayDate)
 
   const now = dayjs()
@@ -236,46 +242,6 @@ const getDiffText = (diff: number): string => {
     return '十一个月后'
   } else {
     return diff + '天'
-  }
-}
-
-const onEdit = (birthdayId: string): void => {
-  uni.navigateTo({
-    url: `/pagesBirthday/add-birthday/add-birthday?id=${birthdayId}`,
-  })
-}
-
-const swipeClick = (e: any, item: any) => {
-  if (e.content.id === 'delete') {
-    uni.showModal({
-      title: '提示',
-      content: `确定删除${item.name}的生日提醒吗？`,
-      success: async (res) => {
-        if (res.confirm) {
-          try {
-            await http({
-              url: `/birthday/${item.id}`,
-              method: 'DELETE',
-            })
-            uni.showToast({
-              title: '删除成功',
-              icon: 'success',
-            })
-            getBirthdayList()
-          } catch (e) {
-            uni.showToast({
-              title: '删除失败',
-              icon: 'error',
-            })
-          }
-        } else if (res.cancel) {
-          uni.showToast({
-            title: '已取消删除',
-            icon: 'none',
-          })
-        }
-      },
-    })
   }
 }
 </script>

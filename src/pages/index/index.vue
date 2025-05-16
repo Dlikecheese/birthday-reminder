@@ -39,11 +39,12 @@ const info: Ref<{
 })
 
 let noticeText = ''
+let allBirthdays = [] as any[]
 let birthdaysInCurrentMonth = ref([] as any[])
 
 const monthSwith = (e: any) => {
   const { month } = e
-  birthdaysInCurrentMonth.value = info.value.selected.filter((item: any) => {
+  birthdaysInCurrentMonth.value = allBirthdays.filter((item: any) => {
     const birthdayDate = dayjs(item.date)
     return birthdayDate.month() + 1 === month
   })
@@ -74,6 +75,7 @@ const getBirthdayList = async () => {
     }
   })
 
+  allBirthdays = birthdays
   setSelected(birthdays)
 
   monthSwith({
@@ -106,6 +108,7 @@ const getCurrentYearBirthday = (birthday: string, birthdayType: BirthdayType) =>
   let solarBirthday = birthday
   if (birthdayType === BirthdayType.LUNAR) {
     solarBirthday = calculateSolarBirthday(birthday)
+    return solarBirthday
   }
 
   const birthdayMonth = dayjs(solarBirthday).month()

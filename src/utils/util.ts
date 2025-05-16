@@ -118,32 +118,38 @@ export const getWXUserInfo = (): Promise<UserInfo> => {
 export function calculateZodiac(birthday: any): string {
   const zodiacs: string[] = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪']
 
-  let birthdayDate: string = birthday.birthday
   if (birthday.birthdayType === BirthdayType.SOLAR) {
     const birthdayArr = birthday.birthday.split('-')
-    birthdayDate = calendar.solar2lunar(birthdayArr[0], birthdayArr[1], birthdayArr[2]).lunarDate
+    return calendar.solar2lunar(
+      Number(birthdayArr[0]),
+      Number(birthdayArr[1]),
+      Number(birthdayArr[2]),
+    ).Animal
   }
 
-  const year: number = new Date(birthdayDate).getFullYear()
+  const year: number = Number(birthday.birthday.split('-')[0])
+
   const baseYear: number = 1900
   const index: number = (year - baseYear) % 12
   return zodiacs[index]
 }
 
 /**
- * 根据公历日期计算当年农历日期
+ * 根据农历生日计算当年公历生日日期
  * @param date 格式yyyy-MM-dd
  */
 export function calculateSolarBirthday(lunarBirthdayDate: string): string {
   const lunarDateArr = lunarBirthdayDate.split('-')
+  const thisYear = dayjs().year()
   // 计算农历新年的公历日期
-  const newYearDate = calendar.lunar2solar(dayjs().year(), 1, 1).date
-  let lunarYear = dayjs().year().toString()
+  const newYearDate = calendar.lunar2solar(thisYear, 1, 1).date
 
-  // 判断农历新年是否在当前日期之前
-  if (dayjs(lunarBirthdayDate).isBefore(newYearDate)) {
+  let lunarYear = thisYear.toString()
+
+  // 判断农历新年是否在当前日期之后
+  if (dayjs(lunarBirthdayDate).set('year', thisYear).isBefore(dayjs(newYearDate))) {
     // 如果在新年之前，则需要减去一年
-    lunarYear = (Number(lunarYear) - 1).toString()
+    lunarYear = (thisYear - 1).toString()
   }
   // 计算农历日期对应的公历日期
   const solarDate = calendar.lunar2solar(lunarYear, lunarDateArr[1], Number(lunarDateArr[2])).date
