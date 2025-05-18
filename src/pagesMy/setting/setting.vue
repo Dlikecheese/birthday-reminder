@@ -122,6 +122,8 @@ const submit = async () => {
       avatar: avatarUrlSrc.value,
     })
 
+    uni.setStorageSync('refresh', true)
+
     uni.showToast({
       title: '修改成功',
       icon: 'success',
