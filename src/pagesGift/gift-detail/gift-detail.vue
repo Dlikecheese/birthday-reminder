@@ -174,6 +174,7 @@ const onLike = async (item: any) => {
     method: 'POST',
   })
   item.isFavoritedByUser = !item.isFavoritedByUser
+  uni.setStorageSync('refresh', true)
 
   if (item.isFavoritedByUser) {
     item.favoriteCount += 1
@@ -188,6 +189,7 @@ const onCollect = async (item: any) => {
     method: 'POST',
   })
   item.isCollectedByUser = !item.isCollectedByUser
+  uni.setStorageSync('refresh', true)
 
   if (item.isCollectedByUser) {
     item.collectCount += 1

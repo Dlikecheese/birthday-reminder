@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/utils/http'
+import { baseURL, http } from '@/utils/http'
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/index'
@@ -64,6 +64,43 @@ const formRef = ref(null) as any
 const onChooseAvatar = (e: any) => {
   const { avatarUrl } = e.detail
   avatarUrlSrc.value = avatarUrl
+  uni.uploadFile({
+    url: `${baseURL}/common/upload`,
+    filePath: avatarUrl,
+    name: 'file',
+    header: {
+      'Content-Type': 'multipart/form-data',
+    },
+    success: async (res: any) => {
+      if (res.statusCode === 413) {
+        uni.showToast({
+          title: '图片超过5MB，请重新选择',
+          icon: 'error',
+        })
+        return
+      }
+      const data = JSON.parse(res.data)
+      try {
+        if (res.statusCode === 200) {
+          avatarUrlSrc.value = data.data
+        }
+      } catch (e) {
+        uni.showToast({
+          title: '图片上传失败',
+          icon: 'error',
+        })
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    fail: (fail) => {
+      uni.hideLoading()
+      uni.showToast({
+        title: fail.errMsg,
+        icon: 'error',
+      })
+    },
+  })
 }
 
 const submit = async () => {
