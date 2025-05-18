@@ -56,13 +56,17 @@ const info: Ref<{
 let noticeText = ''
 let allBirthdays = [] as any[]
 let birthdaysInCurrentMonth = ref([] as any[])
+let currentMonth = dayjs().month() + 1
 
 const monthSwith = (e: any) => {
   const { year, month } = e
+  currentMonth = month
   birthdaysInCurrentMonth.value = allBirthdays.filter((item: any) => {
     const birthdayDate = dayjs(item.date)
     return birthdayDate.month() + 1 === month
   })
+  console.log('birthdaysInCurrentMonth', birthdaysInCurrentMonth.value)
+
   noticeText = `本月有 ${birthdaysInCurrentMonth.value.length} 个生日`
 
   getHolidaysInTargetYear(year)
@@ -93,7 +97,7 @@ const getBirthdayList = async () => {
   setSelected(res.data, dayjs().year())
 
   monthSwith({
-    month: dayjs().month() + 1,
+    month: currentMonth,
   })
 }
 
