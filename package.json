@@ -86,6 +86,7 @@
     "@vue/eslint-config-typescript": "^11.0.0",
     "@vue/runtime-core": "^3.2.45",
     "@vue/tsconfig": "^0.7.0",
+    "date-holidays": "^3.24.2",
     "eslint": "^8.22.0",
     "eslint-plugin-vue": "^9.3.0",
     "husky": "^8.0.0",

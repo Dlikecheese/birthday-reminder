@@ -25,6 +25,21 @@ import { http } from '@/utils/http'
 import dayjs from 'dayjs'
 import { BirthdayType } from '@/types/common'
 import { onShow } from '@dcloudio/uni-app'
+import Holidays from 'date-holidays'
+const hd = new Holidays('CN')
+let holidaysInThisYear = [] as any[]
+let uniqueBirthdays = [] as any[]
+
+const getHolidaysInTargetYear = (year = dayjs().year()) => {
+  const holidays = hd.getHolidays(year)
+  holidaysInThisYear = holidays.map((ele) => {
+    return {
+      date: ele.date.split(' ')[0],
+      info: ele.name,
+    }
+  })
+}
+getHolidaysInTargetYear()
 
 const info: Ref<{
   lunar: boolean
@@ -43,12 +58,15 @@ let allBirthdays = [] as any[]
 let birthdaysInCurrentMonth = ref([] as any[])
 
 const monthSwith = (e: any) => {
-  const { month } = e
+  const { year, month } = e
   birthdaysInCurrentMonth.value = allBirthdays.filter((item: any) => {
     const birthdayDate = dayjs(item.date)
     return birthdayDate.month() + 1 === month
   })
   noticeText = `本月有 ${birthdaysInCurrentMonth.value.length} 个生日`
+
+  getHolidaysInTargetYear(year)
+  info.value.selected = [...uniqueBirthdays, ...holidaysInThisYear]
 }
 
 onMounted(async () => {
@@ -94,14 +112,14 @@ const setSelected = (birthdays: any[]): void => {
   })
 
   // 将去重后的对象转换为数组
-  const uniqueBirthdays = Array.from(uniqueBirthday.entries()).map(([birthday, items]) => {
+  uniqueBirthdays = Array.from(uniqueBirthday.entries()).map(([birthday, items]) => {
     return {
       date: items[0].date,
       info: items.map((item: any) => item.name).join('、') + '生日',
     }
   })
 
-  info.value.selected = uniqueBirthdays
+  info.value.selected = [...uniqueBirthdays, ...holidaysInThisYear]
 }
 
 const getCurrentYearBirthday = (birthday: string, birthdayType: BirthdayType) => {
