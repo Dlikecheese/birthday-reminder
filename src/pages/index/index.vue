@@ -24,7 +24,7 @@ import { calculateSolarBirthday, isLogin, toLogin } from '@/utils/util'
 import { http } from '@/utils/http'
 import dayjs from 'dayjs'
 import { BirthdayType } from '@/types/common'
-import { onShow } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import Holidays from 'date-holidays'
 const hd = new Holidays('CN')
 let holidaysInThisYear = [] as any[]
@@ -66,9 +66,14 @@ const monthSwith = (e: any) => {
   noticeText = `本月有 ${birthdaysInCurrentMonth.value.length} 个生日`
 
   getHolidaysInTargetYear(year)
+  setSelected(allBirthdays, year)
   info.value.selected = [...uniqueBirthdays, ...holidaysInThisYear]
 }
 
+onLoad(async () => {
+  await checkLogin()
+  getBirthdayList()
+})
 onMounted(async () => {
   await checkLogin()
   getBirthdayList()
@@ -85,25 +90,26 @@ const getBirthdayList = async () => {
     method: 'GET',
   })
 
-  const birthdays = res.data?.map((item: any) => {
-    return {
-      ...item,
-      date: getCurrentYearBirthday(item.birthday, item.birthdayType),
-      info: `${item.name}生日`,
-    }
-  })
-
-  allBirthdays = birthdays
-  setSelected(birthdays)
+  setSelected(res.data, dayjs().year())
 
   monthSwith({
     month: dayjs().month() + 1,
   })
 }
 
-const setSelected = (birthdays: any[]): void => {
+const setSelected = (birthdays: any[], year: number): void => {
+  const transformedBirthday = birthdays?.map((item: any) => {
+    return {
+      ...item,
+      date: getCurrentYearBirthday(item.birthday, item.birthdayType, year),
+      info: `${item.name}生日`,
+    }
+  })
+
+  allBirthdays = transformedBirthday
+
   const uniqueBirthday = new Map()
-  birthdays.forEach((item: any) => {
+  transformedBirthday.forEach((item: any) => {
     const birthday = item.date
     if (!uniqueBirthday.has(birthday)) {
       uniqueBirthday.set(birthday, [])
@@ -122,16 +128,23 @@ const setSelected = (birthdays: any[]): void => {
   info.value.selected = [...uniqueBirthdays, ...holidaysInThisYear]
 }
 
-const getCurrentYearBirthday = (birthday: string, birthdayType: BirthdayType) => {
+const getCurrentYearBirthday = (
+  birthday: string,
+  birthdayType: BirthdayType,
+  year = dayjs().year(),
+) => {
   let solarBirthday = birthday
   if (birthdayType === BirthdayType.LUNAR) {
-    solarBirthday = calculateSolarBirthday(birthday)
+    solarBirthday = calculateSolarBirthday(birthday, year)
     return solarBirthday
   }
 
   const birthdayMonth = dayjs(solarBirthday).month()
   const birthdayDate = dayjs(solarBirthday).date()
-  const birthdayDateInThisYear = dayjs().set('month', birthdayMonth).set('date', birthdayDate)
+  const birthdayDateInThisYear = dayjs()
+    .set('year', year)
+    .set('month', birthdayMonth)
+    .set('date', birthdayDate)
 
   return `${birthdayDateInThisYear.format('YYYY-MM-DD')}`
 }

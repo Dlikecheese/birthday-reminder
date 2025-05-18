@@ -138,21 +138,24 @@ export function calculateZodiac(birthday: any): string {
  * 根据农历生日计算当年公历生日日期
  * @param date 格式yyyy-MM-dd
  */
-export function calculateSolarBirthday(lunarBirthdayDate: string): string {
+export function calculateSolarBirthday(
+  lunarBirthdayDate: string,
+  year: number = dayjs().year(),
+): string {
   const lunarDateArr = lunarBirthdayDate.split('-')
-  const thisYear = dayjs().year()
-  // 计算农历新年的公历日期
-  const newYearDate = calendar.lunar2solar(thisYear, 1, 1).date
+  const currentYear = year
 
-  let lunarYear = thisYear.toString()
+  let lunarYear = currentYear.toString()
 
-  // 判断农历新年是否在当前日期之后
-  if (dayjs(lunarBirthdayDate).set('year', thisYear).isBefore(dayjs(newYearDate))) {
-    // 如果在新年之前，则需要减去一年
-    lunarYear = (thisYear - 1).toString()
-  }
   // 计算农历日期对应的公历日期
-  const solarDate = calendar.lunar2solar(lunarYear, lunarDateArr[1], Number(lunarDateArr[2])).date
+  let solarDate = calendar.lunar2solar(lunarYear, lunarDateArr[1], Number(lunarDateArr[2])).date
 
-  return solarDate
+  // 腊月单独处理：可能是在下一年
+  if (solarDate.split('-')[0] !== currentYear.toString()) {
+    lunarYear = (currentYear - 1).toString()
+
+    solarDate = calendar.lunar2solar(lunarYear, lunarDateArr[1], Number(lunarDateArr[2])).date
+  }
+
+  return dayjs(solarDate).format('YYYY-MM-DD')
 }

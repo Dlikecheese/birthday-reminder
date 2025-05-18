@@ -172,7 +172,7 @@ const operations = ref([
       <view @click="item.click(item)" class="flex items-center justify-between">
         <view class="left">{{ item.label }}</view>
         <view class="right">
-          <text v-if="!item.disabled" @click="item.click">></text>
+          <text v-if="!item.disabled">></text>
           <text v-else>{{ item.disabledTip }}</text>
         </view>
       </view>

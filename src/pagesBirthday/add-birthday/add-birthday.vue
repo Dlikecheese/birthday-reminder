@@ -353,7 +353,7 @@ onShareAppMessage(() => {
   width: 100%;
   left: 0;
   border-top: 1px solid #f2f2f2;
-  padding: 10px 10px 0;
+  padding: 10px;
   background-color: #fff;
   align-items: center;
   z-index: 98;

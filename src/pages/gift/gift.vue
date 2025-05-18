@@ -231,6 +231,8 @@ const addGift = () => {
   position: fixed;
   right: 30px;
   bottom: 30px;
+  background-color: #fff;
+  border-radius: 50%;
 }
 
 .waterfall-container {
