@@ -4,20 +4,7 @@ import defaultAvatar from '@/static/images/default-avatar.jpeg'
 import { ref } from 'vue'
 import { wxLogin } from '@/utils/util'
 import { http } from '@/utils/http'
-import { onLoad } from '@dcloudio/uni-app'
 import { TEMPLATE_ID } from '@/utils/common'
-
-onLoad(() => {
-  uni.getSetting({
-    withSubscriptions: true,
-    success(res) {
-      const status = res.subscriptionsSetting.itemSettings?.[TEMPLATE_ID]
-      if (status === 'accept') {
-        setSubscribeStatus(true, '已订阅')
-      }
-    },
-  })
-})
 
 const setSubscribeStatus = (disabled: boolean, text: string) => {
   const subscribeOps = operations.value.find((ele) => ele.id === 'subscribe')

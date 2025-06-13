@@ -65,7 +65,6 @@ const monthSwith = (e: any) => {
     const birthdayDate = dayjs(item.date)
     return birthdayDate.month() + 1 === month
   })
-  console.log('birthdaysInCurrentMonth', birthdaysInCurrentMonth.value)
 
   noticeText = `本月有 ${birthdaysInCurrentMonth.value.length} 个生日`
 
