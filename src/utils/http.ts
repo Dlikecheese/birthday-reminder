@@ -6,8 +6,11 @@
  */
 
 import { useUserStore } from '@/stores'
-
-export const baseURL = 'http://localhost:8080'
+let url = 'http://localhost:9898'
+if (process.env.NODE_ENV === 'production') {
+  url = 'https://www.birthday-reminder.xyz:9898'
+}
+export const baseURL = url
 
 // 添加拦截器
 const httpInterceptor = {
@@ -18,7 +21,7 @@ const httpInterceptor = {
       options.url = baseURL + options.url
     }
     // 2. 请求超时, 默认 60s
-    options.timeout = 10000
+    options.timeout = 350000
     // 3. 添加小程序端请求头标识
     options.header = {
       ...options.header,
